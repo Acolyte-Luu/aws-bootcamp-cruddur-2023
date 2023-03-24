@@ -1,11 +1,25 @@
-export HONEYCOMB_API_KEY="wIeZPrLtleGbH8iLpsk8QB"
-gp env HONEYCOMB_API_KEY="wIeZPrLtleGbH8iLpsk8QB"
-export HONEYCOMB_SERVICE_NAME="Cruddur"
-gp env HONEYCOMB_SERVICE_NAME="Cruddur"
+aws rds create-db-instance \
+  --db-instance-identifier cruddur-db-instance \
+  --db-instance-class db.t3.micro \
+  --engine postgres \
+  --engine-version  14.6 \
+  --master-username unamused \
+  --master-user-password Geraltrivia312 \
+  --allocated-storage 20 \
+  --availability-zone us-east-1a \
+  --backup-retention-period 0 \
+  --port 5432 \
+  --no-multi-az \
+  --db-name cruddur \
+  --storage-type gp2 \
+  --publicly-accessible \
+  --storage-encrypted \
+  --enable-performance-insights \
+  --performance-insights-retention-period 7 \
+  --no-deletion-protection
 
 
-REACT_AWS_PROJECT_REGION=
-REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID=
-REACT_APP_AWS_COGNITO_REGION=
-REACT_APP_AWS_USER_POOLS_ID=
-REACT_APP_CLIENT_ID=
+
+  export CONNECTION_URL = "postgresql://postgres:password@localhost:5432/cruddur"
+  export PROD_CONNECTION_URL = "postgresql://unamused:Geraltrivia312@cruddur-db-instance.cpz8hi0tdpgw.us-east-1.rds.amazonaws.com:5432/cruddur"
+  gp env PROD_CONNECTION_URL ="postgresql://unamused:Geraltrivia312@cruddur-db-instance.cpz8hi0tdpgw.us-east-1.rds.amazonaws.com:5432/cruddur"
