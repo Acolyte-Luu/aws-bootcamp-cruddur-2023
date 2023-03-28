@@ -1,12 +1,29 @@
 import uuid
+from psycopg_pool import ConnectionPool
+from lib.db import db
 from datetime import datetime, timedelta, timezone
 class CreateActivity:
+  def create_activity(user_uuid, message, expires_at):
+    sql = f"""
+    INSERT INTO (
+      user_uuid,
+      message,
+      expires_at
+    )
+    VALUES(
+      "{user_uuid}",
+      "{message}",
+      "{expires_at}"
+    )
+    """
+    query_commit(sql)
+
   def run(message, user_handle, ttl):
     model = {
       'errors': None,
       'data': None
     }
-
+    
     now = datetime.now(timezone.utc).astimezone()
 
     if (ttl == '30-days'):
@@ -40,6 +57,7 @@ class CreateActivity:
         'message': message
       }   
     else:
+      self.create_activity()
       model['data'] = {
         'uuid': uuid.uuid4(),
         'display_name': 'Andrew Brown',
