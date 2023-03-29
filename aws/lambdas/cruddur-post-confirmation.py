@@ -13,22 +13,22 @@ def lambda_handler(event, context):
 
         sql =f"""
         INSERT INTO public.users (display_name, handle, email, cognito_user_id) 
-        VALUES(
-        '{user_display_name}',
-        '{user_handle}',
-        '{user_email}',
-        '{user_cognito_id}')
+        VALUES(%s,%s,%s,%s)
         """
-        cur.execute(sql)
+        params = [
+        user_display_name,
+        user_handle,
+        user_email,
+        user_cognito_id
+        ]
+        cur.execute(sql, *params)
         conn.commit() 
 
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-        
+        print(error)       
     finally:
         if conn is not None:
             cur.close()
             conn.close()
             print('Database connection closed.')
-
     return event
