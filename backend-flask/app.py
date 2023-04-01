@@ -116,7 +116,7 @@ def rollbar_test():
 
 @app.route("/api/message_groups", methods=['GET'])
 def data_message_groups():
-  user_handle  = 'andrewbrown'
+  user_handle  = 'luu'
   model = MessageGroups.run(user_handle=user_handle)
   if model['errors'] is not None:
     return model['errors'], 422
