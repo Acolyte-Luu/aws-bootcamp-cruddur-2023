@@ -23,12 +23,12 @@ class Db:
     self.pool = ConnectionPool(connection_url)
 
 
-  def print_sql(self,title,sql):
+  def print_sql(self,title,sql,parameters={}):
     cyan = '\033[96m'
     no_color = '\033[0m'
     print("\n")
     print(f"{cyan}SQL STATEMENT----[{title}]----{no_color}")
-    print(sql + "\n")
+    print(sql, parameters)
 
 
 #Function to commit data to database
@@ -49,26 +49,33 @@ class Db:
       self.print_sql_error(err)
       #conn.rollback()
 
-
-# Function to return json object
-  def query_array_json(self,sql,params={}):
-    print("SQL----[array]")
-    print(sql + "\n")
-    wrapped_sql = self.query_wrap_array(sql)
+# Function to return a single value
+  def query_value(self,sql,parameters={}):
+    self.print_sql('value',sql,parameters)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
-        cur.execute(wrapped_sql,params)
+        cur.execute(sql,parameters)
         json = cur.fetchone()
         return json[0]
 
 
-  def query_object_json(self,sql,params={}):
-    print("SQL----[object]")
-    print(sql + "\n")
+# Function to return json object
+  def query_array_json(self,sql,parameters={}):
+    self.print_sql('array_json',sql,parameters)
+    wrapped_sql = self.query_wrap_array(sql)
+    with self.pool.connection() as conn:
+      with conn.cursor() as cur:
+        cur.execute(wrapped_sql,parameters)
+        json = cur.fetchone()
+        return json[0]
+
+
+  def query_object_json(self,sql,parameters={}):
+    self.print_sql('object_json',sql,parameters)
     wrapped_sql = self.query_wrap_object(sql)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
-        cur.execute(wrapped_sql,params)
+        cur.execute(wrapped_sql,parameters)
         json = cur.fetchone()
         if json == None:
           "{}"
