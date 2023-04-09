@@ -32,9 +32,10 @@ class Db:
 
 
 #Function to commit data to database
-  def query_commit(self,sql,parameters):
-    self.print_sql('commit with returning',sql)
+  def query_commit(self,sql,parameters={}):
+    self.print_sql('commit with returning',sql,parameters)
     pattern = r"\bRETURNING\b"
+
     is_returning_id = re.search(pattern,sql)
     try:
       with self.pool.connection() as conn:
@@ -51,7 +52,7 @@ class Db:
 
 # Function to return a single value
   def query_value(self,sql,parameters={}):
-    self.print_sql('value',sql,parameters)
+    self.print_sql('value',sql)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
         cur.execute(sql,parameters)
@@ -68,6 +69,8 @@ class Db:
         cur.execute(wrapped_sql,parameters)
         json = cur.fetchone()
         return json[0]
+
+
 
 
   def query_object_json(self,sql,parameters={}):
