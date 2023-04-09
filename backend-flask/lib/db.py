@@ -23,6 +23,7 @@ class Db:
     self.pool = ConnectionPool(connection_url)
 
 
+
   def print_sql(self,title,sql,parameters={}):
     cyan = '\033[96m'
     no_color = '\033[0m'
@@ -69,8 +70,6 @@ class Db:
         cur.execute(wrapped_sql,parameters)
         json = cur.fetchone()
         return json[0]
-
-
 
 
   def query_object_json(self,sql,parameters={}):
