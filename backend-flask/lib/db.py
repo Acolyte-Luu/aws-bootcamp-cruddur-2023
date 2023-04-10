@@ -53,13 +53,13 @@ class Db:
 
 # Function to return a single value
   def query_value(self,sql,parameters={}):
-    self.print_sql('value',sql)
+    self.print_sql('value',sql,parameters)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
         cur.execute(sql,parameters)
         json = cur.fetchone()
         return json[0]
-
+        
 
 # Function to return json object
   def query_array_json(self,sql,parameters={}):
