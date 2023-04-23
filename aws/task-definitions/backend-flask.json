@@ -44,8 +44,8 @@
           {"name": "OTEL_EXPORTER_OTLP_ENDPOINT", "value": "https://api.honeycomb.io"},
           {"name": "AWS_COGNITO_USER_POOL_ID", "value": "us-east-1_SUgtNavkQ"},
           {"name": "AWS_COGNITO_USER_POOL_CLIENT_ID", "value": "trsbt6en55cqbmrhrstr2mdcv"},
-          {"name": "FRONTEND_URL", "value": "acolyteluu.cloud"},
-          {"name": "BACKEND_URL", "value": "api.acolyteluu.cloud"},
+          {"name": "FRONTEND_URL", "value": "https://acolyteluu.cloud"},
+          {"name": "BACKEND_URL", "value": "https://api.acolyteluu.cloud"},
           {"name": "AWS_DEFAULT_REGION", "value": "us-east-1"}
         ],
         "secrets": [
