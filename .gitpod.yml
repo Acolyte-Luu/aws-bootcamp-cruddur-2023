@@ -10,12 +10,13 @@ tasks:
       cd $THEIA_WORKSPACE_ROOT
   - name: react-js
     before: |
-      source "$THEIA_WORKSPACE_ROOT/bin/frontend/generate-env"
+      source "$THEIA_WORKSPACE_ROOT/bin/ecr/login"
+      ruby "$THEIA_WORKSPACE_ROOT/bin/frontend/generate-env"
       cd frontend-react-js
       npm i
   - name: flask
     before: |
-      source "$THEIA_WORKSPACE_ROOT/bin/backend/generate-env
+      ruby "$THEIA_WORKSPACE_ROOT/bin/backend/generate-env
       cd backend-flask
       pip install -r requirements.txt
   - name: sessions manager(fargate)
