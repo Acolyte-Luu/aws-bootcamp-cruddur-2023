@@ -12,7 +12,7 @@ tasks:
   - name: react-js
     before: |
       ruby "$THEIA_WORKSPACE_ROOT/bin/frontend/generate-env"
-      ruby "$THEIA_WORKSPACE_ROOT/bin/backend/generate-env
+      ruby "$THEIA_WORKSPACE_ROOT/bin/backend/generate-env"
       cd frontend-react-js
       npm i
   - name: flask
