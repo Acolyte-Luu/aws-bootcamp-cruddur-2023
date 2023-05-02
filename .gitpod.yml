@@ -9,12 +9,12 @@ tasks:
       sudo ./aws/install
       cd $THEIA_WORKSPACE_ROOT
   - name: react-js
-    command: |
+    before: |
       source "$THEIA_WORKSPACE_ROOT/bin/frontend/generate-env"
       cd frontend-react-js
       npm i
   - name: flask
-    command: |
+    before: |
       source "$THEIA_WORKSPACE_ROOT/bin/backend/generate-env
       cd backend-flask
       pip install -r requirements.txt
