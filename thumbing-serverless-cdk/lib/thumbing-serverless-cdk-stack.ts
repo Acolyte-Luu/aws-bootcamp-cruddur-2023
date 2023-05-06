@@ -1,7 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
+import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
+import * as sns from 'aws-cdk-lib/aws-sns';
 import * as dotenv from 'dotenv';
 import { Construct } from 'constructs';
 
@@ -19,24 +22,42 @@ export class ThumbingServerlessCdkStack extends cdk.Stack {
     const webhookUrl: string = process.env.THUMBING_WEBHOOK_URL as string;
     const topicName: string = process.env.THUMBING_TOPIC_NAME as string;
     const bucket = this.createBucket(bucketName);
-    const lambda = this.createLambda(functionPath, bucketName, folderInput, folderOutput);
+    //const bucket = this.importBucket(bucketName);
 
+    // create lambda function
+    const lambda = this.createLambda(functionPath, bucketName, folderInput, folderOutput);
+    // add s3 event notifcations
     this.createS3NotifyToLambda(folderInput,lambda,bucket)
+
+
+    // create and attach s3 policy
+    const s3ReadWritePolicy= this.createPolicyBucketAccess(bucket.bucketArn)
+    lambda.addToRolePolicy(s3ReadWritePolicy);
+
+    // create sns topic and subscription
+    const snsTopic = this.createsnsTopic(topicName)
+    this.createSnsSubscription(snsTopic,webhookUrl)
+    // add s3 event notifcations
+    this.createS3NotifyToSns(folderOutput,snsTopic,bucket)
     
+
+    // create and attach sns policy
+    //const snsPublishPolicy = this.createPolicySnsPublish(snsTopic.topicArn)
+    //lambda.addToRolePolicy(snsPublishPolicy);
   }
 
   createBucket(bucketName: string): s3.IBucket{
-    const bucket = new s3.Bucket(this, 'AcolyteServerlessBucket',{
+    const bucket = new s3.Bucket(this, 'AcolyteAssetsBucket',{
       bucketName:bucketName,
       removalPolicy: cdk.RemovalPolicy.DESTROY
     });
     return bucket;
   }
 
-  importBucket(bucketName: string): s3.IBucket{
-    const bucket = s3.Bucket.fromBucketName(this, "AcolyteServerlessBucket",bucketName);
-    return bucket;
-  }
+  //importBucket(bucketName: string): s3.IBucket{
+  //  const bucket = s3.Bucket.fromBucketName(this, "AcolyteServerlessBucket",bucketName);
+  //  return bucket;
+  //}
 
   createLambda(functionPath: string, bucketName: string, folderInput: string, folderOutput: string): lambda.IFunction{
     const lambdaFunction = new lambda.Function(this, 'AcolyteServerlessLambda', {
@@ -62,5 +83,54 @@ export class ThumbingServerlessCdkStack extends cdk.Stack {
     )
   }
 
+  createPolicyBucketAccess(bucketArn: string){
+    const s3ReadWritePolicy= new iam.PolicyStatement({
+      actions: [
+        's3:GetObject',
+        's3:PutObject'
+      ],
+      resources: [
+        `${bucketArn}/*`,
+      ]
+    });
+    return s3ReadWritePolicy;
 
+  }
+
+  createsnsTopic(topicName: string): sns.ITopic{
+    const logicalName = "ThumbingTopic";
+    const snsTopic = new sns.Topic(this, logicalName, {
+      topicName: topicName
+    });
+    return snsTopic;
+  }
+
+  createSnsSubscription(snsTopic: sns.ITopic, webhookUrl: string): sns.Subscription{
+    const snsSubscription = snsTopic.addSubscription(
+      new subscriptions.UrlSubscription(webhookUrl)
+    )
+    return snsSubscription;
+  }
+
+  createS3NotifyToSns(prefix: string, snsTopic: sns.ITopic, bucket: s3.IBucket): void{
+    const destination = new s3n.SnsDestination(snsTopic)
+    bucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED_PUT,
+      destination,
+      {prefix: prefix}
+    );
+  }
+  /*
+  createPolicySnsPublish(topicArn: string){
+    const snsPublishPolicy = new iam.PolicyStatement({
+      actions: [
+        'sns:Publish',
+      ],
+      resources: [
+        topicArn
+      ]
+    });
+    return snsPublishPolicy;
+  }
+  */
 }
