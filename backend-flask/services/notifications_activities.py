@@ -7,7 +7,7 @@ class NotificationsActivities:
     #dict = {
     #  "now" : now.isoformat()
     #}
-    segment.put_metadata('key',dict,'namespace')
+    #segment.put_metadata('key',dict,'namespace')
     results = [{
       'uuid': '68f126b0-1ceb-4a33-88be-d90fa7109eee',
       'handle':  'amused_luu',
