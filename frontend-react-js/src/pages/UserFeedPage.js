@@ -63,14 +63,11 @@ export default function UserFeedPage() {
       <DesktopNavigation user={user} active={'profile'} setPopped={setPopped}/>
       <div className='content'>
         <ActivityForm popped={popped} setActivities={setActivities} />
-        <div className='activity_feed'>
-          <ProfileHeading setPopped ={setPoppedProfile} profile={profile}/>
-          <div className='activity_feed_heading'>
-            <div className='title'>{profile.display_name}</div>
-            <div class="cruds_count">{profile.cruds_count} Cruds</div>
-        </div>
+
+      <div className='activity_feed'>
+        <ProfileHeading setPopped ={setPoppedProfile} profile={profile}/>
         <ActivityFeed activities={activities} />
-      </div>
+        </div>
       </div>
       <DesktopSidebar user={user} />
     </article>
