@@ -31,10 +31,18 @@ class Db:
     print(f"{cyan}SQL STATEMENT----[{title}]----{no_color}")
     print(sql, parameters)
 
+  def print_params(self,params):
+    blue = '\033[94m'
+    no_color = '\033[0m'
+    print(f'{blue} SQL Params:{no_color}')
+    for key, value in params.items():
+      print(key, ":", value)
+
 
 #Function to commit data to database
-  def query_commit(self,sql,parameters={}):
-    self.print_sql('commit with returning',sql,parameters)
+  def query_commit(self,sql,parameters={},verbose=True):
+    if verbose:
+      self.print_sql('commit with returning',sql,parameters)
     pattern = r"\bRETURNING\b"
 
     is_returning_id = re.search(pattern,sql)
@@ -52,8 +60,9 @@ class Db:
       #conn.rollback()
 
 # Function to return a single value
-  def query_value(self,sql,parameters={}):
-    self.print_sql('value',sql,parameters)
+  def query_value(self,sql,parameters={},verbose=True):
+    if verbose:
+      self.print_sql('value',sql,parameters)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
         cur.execute(sql,parameters)
@@ -62,8 +71,9 @@ class Db:
         
 
 # Function to return json object
-  def query_array_json(self,sql,parameters={}):
-    self.print_sql('array_json',sql,parameters)
+  def query_array_json(self,sql,parameters={},verbose=True):
+    if verbose:
+      self.print_sql('array_json',sql,parameters)
     wrapped_sql = self.query_wrap_array(sql)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
@@ -72,8 +82,10 @@ class Db:
         return json[0]
 
 
-  def query_object_json(self,sql,parameters={}):
-    self.print_sql('object_json',sql,parameters)
+  def query_object_json(self,sql,parameters={},verbose=True):
+    if verbose:
+      self.print_sql('json',sql,parameters)
+      self.print_params(params) 
     wrapped_sql = self.query_wrap_object(sql)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
