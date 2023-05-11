@@ -3,6 +3,7 @@ import React from "react";
 import process from 'process';
 import {getAccessToken} from '../lib/CheckAuth';
 
+
 export default function ProfileForm(props) {
   const [bio, setBio] = React.useState(0);
   const [displayName, setDisplayName] = React.useState(0);
@@ -11,6 +12,64 @@ export default function ProfileForm(props) {
     setBio(props.profile.bio);
     setDisplayName(props.profile.display_name);
   }, [props.profile])
+
+  const s3uploadkey = async(event)=>{
+    try {
+      console.log('s3uploadkey')
+      const backend_url = "https://mpwrs5fgv8.execute-api.us-east-1.amazonaws.com/avatars/key_upload"
+      await getAccessToken()
+      const access_token = localStorage.getItem("access_token")
+      const res = await fetch(backend_url, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${access_token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      }
+      })
+      let data = await res.json();
+      if (res.status === 200) {
+        console.log('presigned_url', data)
+      } else {
+        console.log(res)
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const s3upload = async(event)=>{
+    console.log('event',event)
+    const file = event.target.files[0]
+    const filename = file.name
+    const size = file.size
+    const type = file.type
+    const preview_image_url = URL.createObjectURL(file)
+    console.log('file',file,filename,size,type)
+
+    const formData = new FormData();
+    formData.append('file',file);
+    try {
+      console.log('s3upload')
+      const backend_url = ""
+      const res = await fetch(backend_url, {
+        method: "POST",
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+      }
+      })
+      let data = await res.json();
+      if (res.status === 200) {
+        console.log('presigned_url', data)
+      } else {
+        console.log(res)
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const onsubmit = async (event) => {
     event.preventDefault();
@@ -65,13 +124,21 @@ export default function ProfileForm(props) {
           className='profile_form popup_form'
           onSubmit={onsubmit}
         >
-          <div class="popup_heading">
-            <div class="popup_title">Edit Profile</div>
+          <div className="popup_heading">
+            <div className="popup_title">Edit Profile</div>
             <div className='submit'>
               <button type='submit'>Save</button>
             </div>
           </div>
           <div className="popup_content">
+
+            <div className="upload" onClick={s3uploadkey}>
+              Upload Avatar
+            </div>
+            <input type="file" name="avatarupload" onChange={s3upload}/>
+            <div className="upload" onClick={s3upload}>
+              Upload Avatar Real
+            </div>
             <div className="field display_name">
               <label>Display Name</label>
               <input

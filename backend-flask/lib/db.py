@@ -31,11 +31,11 @@ class Db:
     print(f"{cyan}SQL STATEMENT----[{title}]----{no_color}")
     print(sql, parameters)
 
-  def print_params(self,params):
+  def print_params(self,parameters):
     blue = '\033[94m'
     no_color = '\033[0m'
     print(f'{blue} SQL Params:{no_color}')
-    for key, value in params.items():
+    for key, value in parameters.items():
       print(key, ":", value)
 
 
@@ -85,7 +85,7 @@ class Db:
   def query_object_json(self,sql,parameters={},verbose=True):
     if verbose:
       self.print_sql('json',sql,parameters)
-      self.print_params(params) 
+      self.print_params(parameters) 
     wrapped_sql = self.query_wrap_object(sql)
     with self.pool.connection() as conn:
       with conn.cursor() as cur:
