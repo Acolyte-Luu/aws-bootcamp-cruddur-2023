@@ -6,6 +6,7 @@ import {getAccessToken} from '../lib/CheckAuth';
 
 export default function ProfileForm(props) {
   const [bio, setBio] = React.useState(0);
+  const [presignedurl, setPresignedurl] = React.useState(0);
   const [displayName, setDisplayName] = React.useState(0);
 
   React.useEffect(()=>{
@@ -22,6 +23,7 @@ export default function ProfileForm(props) {
       const res = await fetch(backend_url, {
         method: "POST",
         headers: {
+          'Origin': "https://3000-acolyteluu-awsbootcampc-oflb7okkcod.ws-eu97.gitpod.io",
           'Authorization': `Bearer ${access_token}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json'
@@ -30,6 +32,7 @@ export default function ProfileForm(props) {
       let data = await res.json();
       if (res.status === 200) {
         console.log('presigned_url', data)
+        return data.url
       } else {
         console.log(res)
       }
@@ -45,24 +48,23 @@ export default function ProfileForm(props) {
     const size = file.size
     const type = file.type
     const preview_image_url = URL.createObjectURL(file)
-    console.log('file',file,filename,size,type)
-
-    const formData = new FormData();
-    formData.append('file',file);
+    console.log(filename,size,type)
+    const presignedurl = await s3uploadkey()
+    console.log('presignedurl',presignedurl)
+    //const formData = new FormData();
+    //formData.append('file',file);
     try {
       console.log('s3upload')
-      const backend_url = ""
-      const res = await fetch(backend_url, {
-        method: "POST",
-        body: formData,
+      const res = await fetch(presignedurl, {
+        method: "PUT",
+        body: file,
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': type
       }
       })
       let data = await res.json();
       if (res.status === 200) {
-        console.log('presigned_url', data)
+        setPresignedurl(data.url)
       } else {
         console.log(res)
       }
