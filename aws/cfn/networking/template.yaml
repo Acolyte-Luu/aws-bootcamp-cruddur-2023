@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: 
+
+#VPC
+Resources:
+  
+#IGW
+#Route Tables
+#Subnet A
+#Subnet B
+#Subnet C
