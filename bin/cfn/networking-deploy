@@ -2,6 +2,7 @@
 set -e # stop execution of script if anything fails
 
 CFN_PATH="/workspace/aws-bootcamp-cruddur-2023/aws/cfn/networking/template.yaml"
+CFN_BUCKET=cfn-artifacts-luu
 
 cfn-lint $CFN_PATH
 aws cloudformation deploy \

@@ -1,16 +1,36 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
+Parameters:
+  Az1:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-east-1a
+  Az2:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-east-1b
+  Az3:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-east-1c
+
+  SubnetCidrBlocks:
+    Description: "Comma-delimited list of CIDR blocks"
+    Type: CommaDelimitedList
+    Default: 10.0.0.0/24, 10.0.4.0/24, 10.0.8.0/24, 10.0.12.0/24, 10.0.16.0/24, 10.0.20.0/24
+
+  VpcCidrBlock:
+    Type: String
+    Default: 10.0.0.0/16
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.0.0.0/16
+      CidrBlock: !Ref VpcCidrBlock
       EnableDnsHostnames: true
       EnableDnsSupport: true
       InstanceTenancy: default
       Tags:
       - Key: Name
-        Value: CruddurVPC
+        Value: !Sub "${AWS::StackName}VPC"
 
   IGW:
     Type: AWS::EC2::InternetGateway
@@ -19,27 +39,171 @@ Resources:
       - Key: Name
         Value: CruddurIGW
 
-  AttachGateway:
+  AttachIGW:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
-      VpcId: ! VPC
-      InternetGatewayId: ! IGW
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref IGW
 
   RouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: ! VPC
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: CruddurRT
+          Value: !Sub '${AWS::StackName}RT'
 
-  myRoute:
+  RouteToIGW:
     Type: AWS::EC2::Route
-    DependsOn: GatewayToInternet
+    DependsOn: AttachIGW
     Properties:
-      RouteTableId: ! myRoutetable
+      RouteTableId: !Ref RouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: ! myInternetGateway
-#Subnet A
-#Subnet B
-#Subnet C
+      GatewayId: !Ref IGW
+
+#  RouteToLocal:
+#    Type: AWS::EC2::Route
+#    Properties:
+#      RouteTableId: ! RouteTable
+#      DestinationCidrBlock: 10.0.0.0/16
+#      GatewayId: "local"
+
+  SubnetPub1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Ref Az1
+      CidrBlock: !Select [0, !Ref SubnetCidrBlocks]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}SubnetPub1'
+
+  SubnetPub2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      #AssignIpv6AddressOnCreation: false
+      AvailabilityZone: !Ref Az2
+      CidrBlock: !Select [1, !Ref SubnetCidrBlocks]
+      EnableDns64: false
+      MapPublicIpOnLaunch: true # this is a public subnet
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}SubnetPub2'
+
+  SubnetPub3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      #AssignIpv6AddressOnCreation: false
+      AvailabilityZone: !Ref Az3
+      CidrBlock: !Select [2, !Ref SubnetCidrBlocks]
+      EnableDns64: false
+      MapPublicIpOnLaunch: true # this is a public subnet
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}SubnetPub3'
+
+  SubnetPriv1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      #AssignIpv6AddressOnCreation: false
+      AvailabilityZone: !Ref Az1
+      CidrBlock: !Select [3, !Ref SubnetCidrBlocks]
+      EnableDns64: false
+      MapPublicIpOnLaunch: false # this is a private subnet
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}SubnetPriv1'
+
+  SubnetPriv2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      #AssignIpv6AddressOnCreation: false
+      AvailabilityZone: !Ref Az2
+      CidrBlock: !Select [4, !Ref SubnetCidrBlocks]
+      EnableDns64: false
+      MapPublicIpOnLaunch: false # this is a private subnet
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}SubnetPriv2'
+
+  SubnetPriv3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      #AssignIpv6AddressOnCreation: false
+      AvailabilityZone: !Ref Az3
+      CidrBlock: !Select [5, !Ref SubnetCidrBlocks]
+      EnableDns64: false
+      MapPublicIpOnLaunch: false # this is a private subnet
+      Tags:
+      - Key: Name
+        Value: !Sub '${AWS::StackName}SubnetPriv3'
+
+
+  SubnetPub1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetPub1
+
+  SubnetPub2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetPub2
+
+  SubnetPub3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetPub3
+
+  SubnetPriv1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetPriv1
+
+  SubnetPriv2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetPriv2
+
+  SubnetPriv3RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref SubnetPriv3
+
+Outputs:
+  VpcId:
+    Value: !Ref VPC
+    Export:
+      Name: VpcId
+
+  VpcCidrBlock:
+    Value: !GetAtt VPC.CidrBlock
+    Export:
+      Name: VpcCidrBlock
+
+  SubnetCidrBlocks:
+    Value: !Join [",", !Ref SubnetCidrBlocks]
+    Export:
+      Name: SubnetCidrBlocks
+
+  SubnetIds:
+    Value: !Join [",", [!Ref SubnetPub1, !Ref SubnetPub2, !Ref SubnetPub3, !Ref SubnetPriv1, !Ref SubnetPriv2, !Ref SubnetPriv3]]
+    Export:
+      Name: SubnetIds
+
+  AvailabilityZones:
+    Value: !Join [",", [!Ref Az1, !Ref Az2, !Ref Az3]]
+    Export:
+      Name: AvailabilityZones
+
