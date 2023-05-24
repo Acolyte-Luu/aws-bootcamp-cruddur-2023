@@ -9,4 +9,5 @@ aws cloudformation deploy \
 --s3-bucket "cfn-artifacts-luu" \
 --template-file $CFN_PATH \
 --no-execute-changeset \
+--tags group=fargate-cluster \
 --capabilities CAPABILITY_NAMED_IAM

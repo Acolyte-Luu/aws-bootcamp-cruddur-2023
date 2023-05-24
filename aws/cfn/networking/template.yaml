@@ -1,4 +1,17 @@
 AWSTemplateFormatVersion: "2010-09-09"
+Description: |
+  Base networking components for our stack:
+  - VPC
+    - set DNS hostnames for EC2 instances
+    - Only IPv4, IPv6 is disabled
+  - Internet Gateway 
+  - Route Table
+    - route to IGW
+    - route to Local
+  - Subnets(6) explicitlyassociated to the route table
+    - 3 public subnets
+    - 3 private subnets
+
 
 Parameters:
   Az1:

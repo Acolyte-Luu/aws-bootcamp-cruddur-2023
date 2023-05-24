@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: |
+  The cluster configuration to support:
+  - ECS FargateCluster
+  - Application Load Balancer (ALB)
+    - IPv4 Only
+    - internet-facing
+  - ALB Security Group
+  - HTTPS Listener
+    - send naked domain to frontend target group
+    - send api.subdomain to backend target group
+  - HTTP Listener
+    - redirects to HTTPS Listener
+  - Backend Target Group
+  - Frontend Target Group
+
+Parameters:
+  CertificateArn:
+    Type: String
+
+Resources:
+  FargateCluster: #Logical Name
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub "${AWS::StackName}FargateCluster"
+      CapacityProviders:
+        - FARGATE
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Configuration:
+        ExecuteCommandConfiguration:
+          Logging: DEFAULT
+      ServiceConnectDefaults:
+        Namespace: cruddur
+
+
+
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${AWS::StackName}ALB"
+      Type: application
+      IpAddressType: IPv4
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref ALBSG
+      Subnets:
+        
+      LoadBalancerAttributes:
+        - Name: routing.http2.enabled
+          Value: true
+        - Name: routing.http.preserve_host_header.enabled
+          Value: false
+        - Name: deletion_protection.enabled
+          Value: true
+        - Name: lod_balancing.cross_zone.enabled
+          Value: true
+        - Name: access_logs.s3.enabled
+          Value: flase
+
+
+  HTTPSListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref Certification
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref FrontendTG
+      LoadBalancerArn: !Ref ALB
+      Port: 443
+      Protocol: HTTPS
+  
+  HTTPListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Protocol: HTTP
+      Port: 80
+      LoadBalancerArn: !Ref ALB
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Protocol: "HTTPS"
+            Port: 443
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+            StatusCode: "HTTP_301"
+  APIALBListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Conditions:
+        - RuleCondition
+      Actions:
+        - Action
+
+      ListenerArn: !Ref HTTPSListener
+      Priority: 1
+
+
+
+  ALBSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Public facing security group for our Cruddur ALB
+      GroupName: !Sub "${AWS::StackName}ALBSG"
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: '0.0.0.0/0'
+          Description: INTERNET HTTPS
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: '0.0.0.0/0'
+          Description: INTERNET HTTP
+
+
+
+
+
+#Metadata:
+#Mappings
+#Outputs:
