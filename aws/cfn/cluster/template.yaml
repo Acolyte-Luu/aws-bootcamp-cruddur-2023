@@ -16,8 +16,63 @@ Description: |
   - Frontend Target Group
 
 Parameters:
+  NetworkingStack:
+    Type: String
+    Description: This is our base layer of network components(VPC,subnets)
+    Default: CruddurNetwork
+
   CertificateArn:
     Type: String
+
+  FrontendContainerPort:
+    Type: Number
+    Default: 3000
+  FrontendHealthCheckIntervalSeconds:
+    Type: Number
+    Default: 15
+  FrontendHealthCheckPath:
+    Type: String
+    Default: "/"
+  FrontendHealthCheckPort:
+    Type: Number
+    Default: 80
+  FrontendHealthCheckProtocol:
+    Type: String
+    Default: HTTP
+  FrontendHealthCheckTimeoutSeconds:
+    Type: Number
+    Default: 5
+  FrontendHealthyThresholdCount:
+    Type: Number
+    Default: 2
+  FrontendUnhealthyThresholdCount:
+    Type: Number
+    Default: 2
+
+  BackendContainerPort:
+    Type: Number
+    Default: 4567
+  BackendHealthCheckIntervalSeconds:
+    Type: Number
+    Default: 15
+  BackendHealthCheckPath:
+    Type: String
+    Default: "/api/health-check"
+  BackendHealthCheckPort:
+    Type: Number
+    Default: 80
+  BackendHealthCheckProtocol:
+    Type: String
+    Default: HTTP
+  BackendHealthCheckTimeoutSeconds:
+    Type: Number
+    Default: 5
+  BackendHealthyThresholdCount:
+    Type: Number
+    Default: 2
+  BackendUnhealthyThresholdCount:
+    Type: Number
+    Default: 2
 
 Resources:
   FargateCluster: #Logical Name
@@ -35,8 +90,6 @@ Resources:
       ServiceConnectDefaults:
         Namespace: cruddur
 
-
-
   ALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -47,32 +100,34 @@ Resources:
       SecurityGroups:
         - !Ref ALBSG
       Subnets:
-        
+        Fn::Split:
+          - ","
+          - Fn::ImportValue:
+              !Sub "${NetworkingStack}SubnetIds"
       LoadBalancerAttributes:
-        - Name: routing.http2.enabled
+        - Key: routing.http2.enabled
           Value: true
-        - Name: routing.http.preserve_host_header.enabled
+        - Key: routing.http.preserve_host_header.enabled
           Value: false
-        - Name: deletion_protection.enabled
+        - Key: deletion_protection.enabled
           Value: true
-        - Name: lod_balancing.cross_zone.enabled
+        - Key: lod_balancing.cross_zone.enabled
           Value: true
-        - Name: access_logs.s3.enabled
+        - Key: access_logs.s3.enabled
           Value: flase
-
 
   HTTPSListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
+      Protocol: HTTPS
+      Port: 443
+      LoadBalancerArn: !Ref ALB
       Certificates:
-        - CertificateArn: !Ref Certification
+        - CertificateArn: !Ref CertificateArn
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref FrontendTG
-      LoadBalancerArn: !Ref ALB
-      Port: 443
-      Protocol: HTTPS
-  
+      
   HTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -88,24 +143,27 @@ Resources:
             Path: "/#{path}"
             Query: "#{query}"
             StatusCode: "HTTP_301"
+
   APIALBListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
       Conditions:
-        - RuleCondition
+        - Field: host-header
+          HostHeaderConfig:
+            Values:
+              - api.acolyteluu.cloud
       Actions:
-        - Action
+        - Type: forward
+          TargetGroupArn: !Ref BackendTG
 
       ListenerArn: !Ref HTTPSListener
       Priority: 1
 
-
-
   ALBSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Public facing security group for our Cruddur ALB
       GroupName: !Sub "${AWS::StackName}ALBSG"
+      GroupDescription: Public facing security group for our Cruddur ALB
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
@@ -118,8 +176,55 @@ Resources:
           CidrIp: '0.0.0.0/0'
           Description: INTERNET HTTP
 
+  BackendTG:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${AWS::StackName}BackendTG"
+      Port: !Ref BackendContainerPort
+      HealthCheckProtocol: !Ref BackendHealthCheckProtocol
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: !Ref BackendHealthCheckIntervalSeconds
+      HealthCheckPath: !Ref BackendHealthCheckPath
+      HealthCheckPort: !Ref BackendHealthCheckPort
+      HealthCheckTimeoutSeconds: !Ref BackendHealthCheckTimeoutSeconds
+      HealthyThresholdCount: !Ref BackendHealthyThresholdCount
+      UnhealthyThresholdCount: !Ref BackendUnhealthyThresholdCount
+      IpAddressType: ipv4
+      Matcher:
+        HttpCode: 200
+      Protocol: HTTP
+      ProtocolVersion: HTTP2
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 0
+      VpcId:
+        Fn::ImportValue:
+          !Sub ${NetworkingStack}VpcId
 
-
+  FrontendTG:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${AWS::StackName}FrontendTG"
+      Port: !Ref FrontendContainerPort
+      HealthCheckProtocol: !Ref FrontendHealthCheckProtocol
+      HealthCheckEnabled: true
+      HealthCheckIntervalSeconds: !Ref FrontendHealthCheckIntervalSeconds
+      HealthCheckPath: !Ref FrontendHealthCheckPath
+      HealthCheckPort: !Ref FrontendHealthCheckPort 
+      HealthCheckTimeoutSeconds: !Ref FrontendHealthCheckTimeoutSeconds
+      HealthyThresholdCount: !Ref FrontendHealthyThresholdCount
+      UnhealthyThresholdCount: !Ref FrontendUnhealthyThresholdCount
+      IpAddressType: ipv4
+      Matcher:
+        HttpCode: 200
+      Protocol: HTTP
+      ProtocolVersion: HTTP2
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 0
+      VpcId: 
+        Fn::ImportValue:
+          !Sub ${NetworkingStack}VpcId
 
 
 #Metadata:

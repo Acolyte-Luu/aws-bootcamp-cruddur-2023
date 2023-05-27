@@ -6,9 +6,9 @@ CFN_BUCKET=cfn-artifacts-luu
 
 cfn-lint $CFN_PATH
 aws cloudformation deploy \
---stack-name "Cruddur" \
+--stack-name "CruddurNetwork" \
 --s3-bucket $CFN_BUCKET \
 --template-file $CFN_PATH \
 --no-execute-changeset \
---tags group=cruddur-cluster \
+--tags group=cruddur-network \
 --capabilities CAPABILITY_NAMED_IAM
