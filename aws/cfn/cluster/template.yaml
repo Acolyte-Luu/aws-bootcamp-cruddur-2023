@@ -6,6 +6,7 @@ Description: |
   - Application Load Balancer (ALB)
     - IPv4 Only
     - internet-facing
+    - certificate attached from AWS Certificate Manager
   - ALB Security Group
   - HTTPS Listener
     - send naked domain to frontend target group
@@ -95,26 +96,26 @@ Resources:
     Properties:
       Name: !Sub "${AWS::StackName}ALB"
       Type: application
-      IpAddressType: IPv4
+      IpAddressType: ipv4
       Scheme: internet-facing
       SecurityGroups:
-        - !Ref ALBSG
+        - !GetAtt ALBSG.GroupId
       Subnets:
         Fn::Split:
           - ","
           - Fn::ImportValue:
-              !Sub "${NetworkingStack}SubnetIds"
+              !Sub "${NetworkingStack}PublicSubnetIds"
       LoadBalancerAttributes:
         - Key: routing.http2.enabled
           Value: true
         - Key: routing.http.preserve_host_header.enabled
           Value: false
         - Key: deletion_protection.enabled
-          Value: true
-        - Key: lod_balancing.cross_zone.enabled
+          Value: false
+        - Key: load_balancing.cross_zone.enabled
           Value: true
         - Key: access_logs.s3.enabled
-          Value: flase
+          Value: false
 
   HTTPSListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -164,6 +165,9 @@ Resources:
     Properties:
       GroupName: !Sub "${AWS::StackName}ALBSG"
       GroupDescription: Public facing security group for our Cruddur ALB
+      VpcId: 
+        Fn::ImportValue:
+          !Sub ${NetworkingStack}VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 443
@@ -229,4 +233,8 @@ Resources:
 
 #Metadata:
 #Mappings
-#Outputs:
+Outputs:
+  ALBSecurityGroupId:
+    Value: !GetAtt ALBSG.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}ALBSecurityGroupId"

@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: |
+  Task Definition
+  Fargate Service
+  Execution Role
+  Task Role
+
+Parameters:
+  NetworkingStack:
+    Type: String
+    Description: This is our base layer of network components(VPC,subnets)
+    Default: CruddurNetwork
+
+  ClusterStack:
+    Type: String
+    Description: This is our base layer of infrastructure(ALB,TG,SG)
+    Default: CruddurCluster
+
+  CertificateArn:
+    Type: String
+
+  ServiceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub "${AWS::StackName}ALBSG"
+      GroupDescription: Public facing security group for our Cruddur ALB
+      VpcId: 
+        Fn::ImportValue:
+          !Sub ${NetworkingStack}VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          SourceSecurityGroupId:
+            Fn::ImportValue:
+              !Sub ${NetworkingStack}ALBSecurityGroupId
+          FromPort: 80
+          ToPort: 80
+          CidrIp: '0.0.0.0/0'
+          Description: ALB HTTP
+
+  FargateService:
+  TaskDefinition:
+  ExecutionRole:
+  TaskRole:
+
+
+
+
+Resources:
