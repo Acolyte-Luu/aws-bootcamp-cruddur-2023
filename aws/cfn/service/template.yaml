@@ -32,13 +32,44 @@ Parameters:
         - IpProtocol: tcp
           SourceSecurityGroupId:
             Fn::ImportValue:
-              !Sub ${NetworkingStack}ALBSecurityGroupId
+              !Sub ${ClusterStack}ALBSecurityGroupId
           FromPort: 80
           ToPort: 80
           CidrIp: '0.0.0.0/0'
           Description: ALB HTTP
 
   FargateService:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster:
+      DeploymentConfiguration:
+      DeploymentContainer:
+      DesiredCount:
+      EnableECSManagedTags: true
+      EnableExecuteCommnad: true
+      HealthCheckGracePeriodSeconds:
+      LaunchType: FARGATE
+      LoadBalancers:
+        - TargetGroupArn: "arn:aws:elasticloadbalancing:us-east-1:713826515582:targetgroup/cruddur-backend-flask-tg/12a1311b2dd9cc43"
+          ContainerName: 'backend-flask'
+          ContainerPort: 4567
+
+
+
+
+
+
+
+      NetworkConfiguration:
+      PlatformVersion: LATEST
+      PropagateTags: TASK_DEFINITION
+      Role:
+      ServiceConnectConfiguration:
+      ServiceName:
+
+
+
+
   TaskDefinition:
   ExecutionRole:
   TaskRole:
