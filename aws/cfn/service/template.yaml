@@ -21,6 +21,22 @@ Parameters:
     Type: Number
     Default: 4567
 
+  ServiceName:
+    Type: String
+    Default: 'backend-flask'
+
+  EcrImage:
+    Type: String
+    Default: '713826515582.dkr.ecr.us-east-1.amazonaws.com/backend-flask'
+
+  ServiceCpu:
+    Type: String
+    Default: '256'
+
+  ServiceMemory:
+    Type: String
+    Default: '512'
+
   TaskFamily:
     Type: String
     Default: backend-flask
@@ -76,7 +92,7 @@ Resources:
           Port: !Ref ContainerPort
           ContainerName: 'backend-flask'
           ContainerPort: !Ref ContainerPort
-      ServiceName: !Ref TaskFamily
+      ServiceName: !Ref ServiceName
       TaskDefinition: !Ref TaskFamily
   
 
@@ -87,8 +103,8 @@ Resources:
       ExecutionRoleArn: "arn:aws:iam::713826515582:role/CruddurServiceExecutionRole"
       TaskRoleArn: "arn:aws:iam::713826515582:role/CruddurTaskRole"
       NetworkMode: "awsvpc"
-      Cpu: "256"
-      Memory: "512"
+      Cpu: !Ref ServiceCpu
+      Memory: !Ref ServiceMemory
       RequiresCompatibilities:
         - "FARGATE"
       ContainerDefinitions:
@@ -101,7 +117,7 @@ Resources:
               ContainerPort: 2000
               Protocol: "udp"
         - Name: "backend-flask"
-          Image: "713826515582.dkr.ecr.us-east-1.amazonaws.com/backend-flask"
+          Image: !Ref EcrImage
           Essential: true
           HealthCheck:
             Command:
@@ -112,8 +128,8 @@ Resources:
             Retries: 3
             StartPeriod: 60
           PortMappings:
-            - Name: "backend-flask"
-              ContainerPort: 4567
+            - Name: !Ref ContainerName
+              ContainerPort: !Ref ContainerPort
               Protocol: "tcp"
               AppProtocol: "http"
           LogConfiguration:
@@ -121,7 +137,7 @@ Resources:
             Options:
               awslogs-group: "cruddur"
               awslogs-region: "us-east-1"
-              awslogs-stream-prefix: "backend-flask"
+              awslogs-stream-prefix: !Ref ServiceName
           Environment:
             - Name: "OTEL_SERVICE_NAME"
               Value: "backend-flask"
