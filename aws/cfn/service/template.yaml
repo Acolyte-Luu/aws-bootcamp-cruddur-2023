@@ -134,7 +134,9 @@ Resources:
       HealthCheckGracePeriodSeconds: 0
       LaunchType: FARGATE
       LoadBalancers:
-        - TargetGroupArn: "arn:aws:elasticloadbalancing:us-east-1:713826515582:targetgroup/cruddur-backend-flask-tg/12a1311b2dd9cc43"
+        - TargetGroupArn:
+            Fn::ImportValue:
+              !Sub "${ClusterStack}BackendTGArn"
           ContainerName: !Ref ContainerName
           ContainerPort: !Ref ContainerPort
       NetworkConfiguration:
@@ -149,11 +151,19 @@ Resources:
                   !Sub "${NetworkingStack}PublicSubnetIds"
       PlatformVersion: LATEST
       PropagateTags: SERVICE
-      ServiceRegistries:
-        - RegistryArn: !Sub 'arn::aws:servicediscovery:${AWS::Region}:${AWS::AccountId}:service/srv-cruddur-backend-flask'
-          Port: !Ref ContainerPort
-          ContainerName: 'backend-flask'
-          ContainerPort: !Ref ContainerPort
+      ServiceConnectConfiguration:
+        Enabled: true
+        Namespace: "cruddur"
+        Services:
+          - PortName: backend-flask
+            DiscoveryName: backend-flask
+            ClientAliases:
+              - Port: !Ref ContainerPort
+      #ServiceRegistries:
+      #  - RegistryArn: !Sub 'arn::aws:servicediscovery:${AWS::Region}:${AWS::AccountId}:service/srv-cruddur-backend-flask'
+      #    Port: !Ref ContainerPort
+      #    ContainerName: 'backend-flask'
+      #    ContainerPort: !Ref ContainerPort
       ServiceName: !Ref ServiceName
       TaskDefinition: !Ref TaskDefinition
   
@@ -290,3 +300,9 @@ Resources:
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
         - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
 
+
+Outputs:
+  ServiceSecurityGroupId:
+    Value: !GetAtt ServiceSG.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}ServiceSecurityGroupId"

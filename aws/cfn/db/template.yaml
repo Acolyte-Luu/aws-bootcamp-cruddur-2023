@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: |
+  Primary postgres RDS Database for the application
+  - RDS instance
+  - Database Security Group
+
+
+Parameters:
+  BackupRetentionPeriod:
+    Type: Number
+    Default: 0
+
+  DBInstanceClass:
+    Type: String
+    Default: db.t2.micro
+
+Resources:
+  CruddurDatabase:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: 'Snapshot'
+    UpdateReplacePolicy: 'Snapshot'
+    Properties:
+      AllocatedStorage: '20'
+      AllowMajorVersionUpgrade: true
+      AutoMinorVersionUpgrade: true
+      Port: 
+      EnableIAMDatabaseAuthentication: false
+      BackupRetentionPeriod: 0
+      DBInstanceClass: 
+      Engine: postgres
+      MasterUsername: 
+      MasterUserPassword: 
+
+
+
+Outputs:
+  ALBSecurityGroupId:
+    Value: !GetAtt ALBSG.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}ALBSecurityGroupId"
