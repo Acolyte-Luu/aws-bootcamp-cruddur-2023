@@ -238,3 +238,8 @@ Outputs:
     Value: !GetAtt ALBSG.GroupId
     Export:
       Name: !Sub "${AWS::StackName}ALBSecurityGroupId"
+
+  ClusterName:
+    Value: !Ref FargateCluster
+    Export:
+      Name: !Sub "${AWS::StackName}ClusterName"

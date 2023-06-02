@@ -16,6 +16,10 @@ Parameters:
     Type: String
     Description: This is our base layer of infrastructure(ALB,TG,SG)
     Default: CruddurCluster
+
+  ContainerName:
+    Type: String
+    Default: 'backend-flask'
   
   ContainerPort:
     Type: Number
@@ -41,6 +45,63 @@ Parameters:
     Type: String
     Default: backend-flask
 
+  EnvOTELServiceName:
+    Type: String
+    Default: 'backend-flask'
+
+  EnvOTELExporterOTLPEndpoint:
+    Type: String
+    Default: 'https://api.honeycomb.io'
+
+  EnvOTELAWSCognitoUserPoolId:
+    Type: String
+    Default: 'us-east-1_SUgtNavkQ'
+  
+  EnvOTELCognitoUserPoolClientId:
+    Type: String
+    Default: 'trsbt6en55cqbmrhrstr2mdcv'
+
+  EnvFrontendURL:
+    Type: String
+    Default: '*'
+
+  EnvBackendURL:
+    Type: String
+    Default: '*'
+
+  SecretsAWSAccessKeyId:
+    Type: String
+    Default: 'arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID'
+
+  SecretsSecretAccessKey:
+    Type: String
+    Default: 'arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/AWS_SECRET_ACCESS_KEY'
+
+  SecretsConnectionUrl:
+    Type: String
+    Default: 'arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/CONNECTION_URL'
+
+  SecretsRollbarAccessToken:
+    Type: String
+    Default: 'arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/ROLLBAR_ACCESS_TOKEN'
+
+  SecretsOtelExporterOtlpHeaders:
+    Type: String
+    Default: 'arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS'
+
+  CruddurExecutionPolicy:
+    Type: String
+    Default: 'arn:aws:iam::713826515582:policy/CruddurServiceExecutionPolicy'
+
+  CruddurExecutionRole:
+    Type: String
+    Default: 'arn:aws:iam::713826515582:role/CruddurServiceExecutionRole'
+
+  CruddurTaskRole:
+    Type: String
+    Default: 'arn:aws:iam::713826515582:role/CruddurTaskRole'
+
+
 Resources:
   ServiceSG:
     Type: AWS::EC2::SecurityGroup
@@ -57,23 +118,24 @@ Resources:
               !Sub ${ClusterStack}ALBSecurityGroupId
           FromPort: 80
           ToPort: 80
-          CidrIp: '0.0.0.0/0'
           Description: ALB HTTP
 
   FargateService:
     Type: AWS::ECS::Service
     Properties:
       Cluster:
-      DeploymentConfiguration:
-      DeploymentContainer:
-      DesiredCount:
+        Fn::ImportValue:
+          !Sub "${ClusterStack}ClusterName"
+      DeploymentController:
+        Type: ECS
+      DesiredCount: 1
       EnableECSManagedTags: true
-      EnableExecuteCommnad: true
-      HealthCheckGracePeriodSeconds:
+      EnableExecuteCommand: true
+      HealthCheckGracePeriodSeconds: 0
       LaunchType: FARGATE
       LoadBalancers:
         - TargetGroupArn: "arn:aws:elasticloadbalancing:us-east-1:713826515582:targetgroup/cruddur-backend-flask-tg/12a1311b2dd9cc43"
-          ContainerName: 'backend-flask'
+          ContainerName: !Ref ContainerName
           ContainerPort: !Ref ContainerPort
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -93,15 +155,14 @@ Resources:
           ContainerName: 'backend-flask'
           ContainerPort: !Ref ContainerPort
       ServiceName: !Ref ServiceName
-      TaskDefinition: !Ref TaskFamily
+      TaskDefinition: !Ref TaskDefinition
   
-
   TaskDefinition:
     Type: "AWS::ECS::TaskDefinition"
     Properties:
       Family: !Ref TaskFamily
-      ExecutionRoleArn: "arn:aws:iam::713826515582:role/CruddurServiceExecutionRole"
-      TaskRoleArn: "arn:aws:iam::713826515582:role/CruddurTaskRole"
+      ExecutionRoleArn: !Ref CruddurExecutionRole
+      TaskRoleArn: !Ref CruddurTaskRole
       NetworkMode: "awsvpc"
       Cpu: !Ref ServiceCpu
       Memory: !Ref ServiceMemory
@@ -136,33 +197,96 @@ Resources:
             LogDriver: "awslogs"
             Options:
               awslogs-group: "cruddur"
-              awslogs-region: "us-east-1"
+              awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: !Ref ServiceName
           Environment:
             - Name: "OTEL_SERVICE_NAME"
-              Value: "backend-flask"
+              Value: !Ref EnvOTELServiceName
             - Name: "OTEL_EXPORTER_OTLP_ENDPOINT"
-              Value: "https://api.honeycomb.io"
+              Value: !Ref EnvOTELExporterOTLPEndpoint
             - Name: "AWS_COGNITO_USER_POOL_ID"
-              Value: "us-east-1_SUgtNavkQ"
+              Value: !Ref EnvOTELAWSCognitoUserPoolId
             - Name: "AWS_COGNITO_USER_POOL_CLIENT_ID"
-              Value: "trsbt6en55cqbmrhrstr2mdcv"
+              Value: !Ref EnvOTELCognitoUserPoolClientId
             - Name: "FRONTEND_URL"
-              Value: "https://acolyteluu.cloud"
+              Value: !Ref EnvFrontendURL
             - Name: "BACKEND_URL"
-              Value: "https://api.acolyteluu.cloud"
+              Value: !Ref EnvBackendURL
             - Name: "AWS_DEFAULT_REGION"
-              Value: "us-east-1"
+              Value: !Ref AWS::Region
           Secrets:
             - Name: "AWS_ACCESS_KEY_ID"
-              ValueFrom: "arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/AWS_ACCESS_KEY_ID"
+              ValueFrom: !Ref SecretsAWSAccessKeyId
             - Name: "AWS_SECRET_ACCESS_KEY"
-              ValueFrom: "arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/AWS_SECRET_ACCESS_KEY"
+              ValueFrom: !Ref SecretsSecretAccessKey
             - Name: "CONNECTION_URL"
-              ValueFrom: "arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/CONNECTION_URL"
+              ValueFrom: !Ref SecretsConnectionUrl
             - Name: "ROLLBAR_ACCESS_TOKEN"
-              ValueFrom: "arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/ROLLBAR_ACCESS_TOKEN"
+              ValueFrom: !Ref SecretsRollbarAccessToken
             - Name: "OTEL_EXPORTER_OTLP_HEADERS"
-              ValueFrom: "arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS"
+              ValueFrom: !Ref SecretsOtelExporterOtlpHeaders
 
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CruddurServiceExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'ecs-tasks.amazon.aws'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'cruddur-execution-policy'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: VisualEditor0
+                Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:BatchGetImage
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+              - Sid: VisualEditor1
+                Effect: Allow
+                Action:
+                  - ssm:GetParameters
+                  - ssm:GetParameter
+                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cruddur/${ServiceName}/*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+
+
+  TaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CruddurServiceTaskRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'ecs-tasks.amazon.aws'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'cruddur-task-policy'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: VisualEditor0
+                Effect: Allow
+                Action:
+                  - ssmmessages:CreateControlChannel
+                  - ssmmessages:CreateDataChannel
+                  - ssmmessages:OpenControlChannel
+                  - ssmmessages:OpenDataChannel
+                Resource: "*"
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
 
