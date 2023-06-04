@@ -1,0 +1,9 @@
+[deploy]
+bucket = 'cfn-artifacts-luu'
+region = 'us-east-1'
+stack_name = 'CruddurDatabase'
+
+[parameters]
+NetworkingStack = 'CruddurNetwork'
+ClusterStack = 'CruddurCluster'
+MasterUsername = 'unamused'

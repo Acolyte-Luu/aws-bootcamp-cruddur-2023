@@ -103,23 +103,6 @@ Parameters:
 
 
 Resources:
-  ServiceSG:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: !Sub "${AWS::StackName}ALBSG"
-      GroupDescription: Public facing security group for our Cruddur ALB
-      VpcId: 
-        Fn::ImportValue:
-          !Sub ${NetworkingStack}VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          SourceSecurityGroupId:
-            Fn::ImportValue:
-              !Sub ${ClusterStack}ALBSecurityGroupId
-          FromPort: 80
-          ToPort: 80
-          Description: ALB HTTP
-
   FargateService:
     Type: AWS::ECS::Service
     Properties:

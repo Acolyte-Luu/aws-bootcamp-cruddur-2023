@@ -180,6 +180,21 @@ Resources:
           CidrIp: '0.0.0.0/0'
           Description: INTERNET HTTP
 
+  ServiceSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub "${AWS::StackName}ServiceSG"
+      GroupDescription: Security group for our Fargate service
+      VpcId: 
+        Fn::ImportValue:
+          !Sub ${NetworkingStack}VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          SourceSecurityGroupId: !GetAtt ALBSG.GroupId
+          FromPort: 80
+          ToPort: 80
+          Description: ALB HTTP
+
   BackendTG:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -247,6 +262,11 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}ALBSecurityGroupId"
 
+  ServiceSecurityGroupId:
+    Value: !GetAtt ServiceSG.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}ServiceSecurityGroupId"
+
   ClusterName:
     Value: !Ref FargateCluster
     Export:
@@ -261,3 +281,4 @@ Outputs:
     Value: !Ref BackendTG
     Export:
       Name: !Sub "${AWS::StackName}BackendTGArn"
+
