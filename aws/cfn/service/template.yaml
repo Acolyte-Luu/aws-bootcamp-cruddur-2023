@@ -290,3 +290,5 @@ Resources:
 #   Value: !GetAtt ServiceSG.GroupId
 #    Export:
 #      Name: !Sub "${AWS::StackName}ServiceSecurityGroupId"
+
+#Remember to update connection url in parameter store with the new rds db created
