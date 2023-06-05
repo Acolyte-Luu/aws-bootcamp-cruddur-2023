@@ -89,9 +89,9 @@ Parameters:
     Type: String
     Default: 'arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS'
 
-  CruddurExecutionPolicy:
-    Type: String
-    Default: 'arn:aws:iam::713826515582:policy/CruddurServiceExecutionPolicy'
+  #CruddurExecutionPolicy:
+  #  Type: String
+  #  Default: 'arn:aws:iam::713826515582:policy/CruddurServiceExecutionPolicy'
 
   CruddurExecutionRole:
     Type: String
@@ -126,7 +126,8 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
           SecurityGroups:
-            - !GetAtt ServiceSG.GroupId
+            - Fn::ImportValue:
+                !Sub "${ClusterStack}ServiceSecurityGroupId"
           Subnets:
             Fn::Split:
               - ","
@@ -228,28 +229,28 @@ Resources:
         Statement:
           - Effect: 'Allow'
             Principal:
-              Service: 'ecs-tasks.amazon.aws'
+              Service: 'ecs-tasks.amazonaws.com'
             Action: 'sts:AssumeRole'
       Policies:
         - PolicyName: 'cruddur-execution-policy'
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Sid: VisualEditor0
+              - Sid: 'VisualEditor0'
                 Effect: Allow
                 Action:
-                  - ecr:GetAuthorizationToken
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:GetDownloadUrlForLayer
-                  - ecr:BatchGetImage
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
+                  - 'ecr:GetAuthorizationToken'
+                  - 'ecr:BatchCheckLayerAvailability'
+                  - 'ecr:GetDownloadUrlForLayer'
+                  - 'ecr:BatchGetImage'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
                 Resource: "*"
-              - Sid: VisualEditor1
+              - Sid: 'VisualEditor1'
                 Effect: Allow
                 Action:
-                  - ssm:GetParameters
-                  - ssm:GetParameter
+                  - 'ssm:GetParameters'
+                  - 'ssm:GetParameter'
                 Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/cruddur/${ServiceName}/*'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchFullAccess
@@ -264,7 +265,7 @@ Resources:
         Statement:
           - Effect: 'Allow'
             Principal:
-              Service: 'ecs-tasks.amazon.aws'
+              Service: 'ecs-tasks.amazonaws.com'
             Action: 'sts:AssumeRole'
       Policies:
         - PolicyName: 'cruddur-task-policy'
@@ -284,8 +285,8 @@ Resources:
         - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
 
 
-Outputs:
-  ServiceSecurityGroupId:
-    Value: !GetAtt ServiceSG.GroupId
-    Export:
-      Name: !Sub "${AWS::StackName}ServiceSecurityGroupId"
+#Outputs:
+#  ServiceSecurityGroupId:
+#   Value: !GetAtt ServiceSG.GroupId
+#    Export:
+#      Name: !Sub "${AWS::StackName}ServiceSecurityGroupId"

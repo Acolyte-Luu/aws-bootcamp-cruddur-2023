@@ -15,8 +15,9 @@ aws cloudformation deploy \
 --stack-name $STACK_NAME \
 --region $REGION \
 --s3-bucket $BUCKET \
+--s3-prefix backend-service \
 --template-file $CFN_PATH \
 --no-execute-changeset \
 --tags group=cruddur-service \
-#--parameter-overrides $PARAMETERS \
 --capabilities CAPABILITY_NAMED_IAM
+#--parameter-overrides $PARAMETERS \

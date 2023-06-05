@@ -28,24 +28,31 @@ Parameters:
   FrontendContainerPort:
     Type: Number
     Default: 3000
+
   FrontendHealthCheckIntervalSeconds:
     Type: Number
     Default: 15
+
   FrontendHealthCheckPath:
     Type: String
     Default: "/"
+
   FrontendHealthCheckPort:
     Type: Number
     Default: 80
+
   FrontendHealthCheckProtocol:
     Type: String
     Default: HTTP
+
   FrontendHealthCheckTimeoutSeconds:
     Type: Number
     Default: 5
+
   FrontendHealthyThresholdCount:
     Type: Number
     Default: 2
+
   FrontendUnhealthyThresholdCount:
     Type: Number
     Default: 2
@@ -53,24 +60,31 @@ Parameters:
   BackendContainerPort:
     Type: Number
     Default: 4567
+
   BackendHealthCheckIntervalSeconds:
     Type: Number
     Default: 15
+
   BackendHealthCheckPath:
     Type: String
     Default: "/api/health-check"
-  BackendHealthCheckPort:
-    Type: Number
-    Default: 80
+
+  #BackendHealthCheckPort:
+  #  Type: Number
+  #  Default: 80
+
   BackendHealthCheckProtocol:
     Type: String
     Default: HTTP
+
   BackendHealthCheckTimeoutSeconds:
     Type: Number
     Default: 5
+
   BackendHealthyThresholdCount:
     Type: Number
     Default: 2
+
   BackendUnhealthyThresholdCount:
     Type: Number
     Default: 2
@@ -184,15 +198,15 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Sub "${AWS::StackName}ServiceSG"
-      GroupDescription: Security group for our Fargate service
+      GroupDescription: Security group for our Fargate service for cruddur
       VpcId: 
         Fn::ImportValue:
           !Sub ${NetworkingStack}VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           SourceSecurityGroupId: !GetAtt ALBSG.GroupId
-          FromPort: 80
-          ToPort: 80
+          FromPort: !Ref BackendContainerPort
+          ToPort: !Ref BackendContainerPort
           Description: ALB HTTP
 
   BackendTG:
@@ -204,7 +218,7 @@ Resources:
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: !Ref BackendHealthCheckIntervalSeconds
       HealthCheckPath: !Ref BackendHealthCheckPath
-      HealthCheckPort: !Ref BackendHealthCheckPort
+      HealthCheckPort: !Ref BackendContainerPort
       HealthCheckTimeoutSeconds: !Ref BackendHealthCheckTimeoutSeconds
       HealthyThresholdCount: !Ref BackendHealthyThresholdCount
       UnhealthyThresholdCount: !Ref BackendUnhealthyThresholdCount
