@@ -1,8 +1,9 @@
-[deploy]
-bucket = 'cfn-artifacts-luu'
-region = 'us-east-1'
-stack_name = 'CruddurDynamoDb'
+version=0.1
+[default.build.parameters]
+region = "us-east-1"
 
-[parameters]
-NetworkingStack = 'CruddurNetwork'
-ClusterStack = 'CruddurCluster'
+[default.package.parameters]
+region = "us-east-1"
+
+[default.deploy.parameters]
+region = "us-east-1"

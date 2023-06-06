@@ -66,9 +66,8 @@ Resources:
     Properties:
       Architectures:
         - "x86_64"
-      CodeUri: 
-      InlineCode: 
-      PackageType: ZIP
+      CodeUri: aws/lambda/cruddur-ddb-stream
+      PackageType: Zip
       Handler: lambda_handler
       Runtime: !Ref PythonRuntime
       Role: !GetAtt LambdaBasicExecutionRole.Arn
@@ -85,7 +84,7 @@ Resources:
   LambdaLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: "/aws/lambda/cruddur-ddb-stream"
+      LogGroupName: "/aws/lambda/cruddur-ddb-streamNew"
       RetentionInDays: 14
     
   LambdaLogStream:
