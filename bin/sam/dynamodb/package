@@ -10,7 +10,8 @@ echo "PACKAGE STAGE========="
 
 sam package \
 --s3-bucket $ARTIFACT_BUCKET \
+--s3-prefix dynamodb \
 --config-file $CONFIG_PATH \
 --output_template_file $OUTPUT_TEMPLATE_PATH \
---template-file $TEMPLATE_PATH \
---s3-prefix "dynamodb"
+--template-file $TEMPLATE_PATH
+
