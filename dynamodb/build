@@ -2,9 +2,9 @@
 set -e # stop execution of script if anything fails
 #use-container flag is for building the lambda in a container not running it in a custom image
 
-FUNC_DIR="/workspace/aws-bootcamp-cruddur-2023/aws/lambdas/cruddur-messaging-stream"
-TEMPLATE_PATH="/workspace/aws-bootcamp-cruddur-2023/aws/cfn/dynamodb/template.yaml"
-CONFIG_PATH="/workspace/aws-bootcamp-cruddur-2023/aws/cfn/dynamodb/config.toml"
+FUNC_DIR="/workspace/aws-bootcamp-cruddur-2023/dynamodb/cruddur-messaging-stream"
+TEMPLATE_PATH="/workspace/aws-bootcamp-cruddur-2023/dynamodb/template.yaml"
+CONFIG_PATH="/workspace/aws-bootcamp-cruddur-2023/dynamodb/config.toml"
 
 sam validate \
 --template-file $TEMPLATE_PATH
