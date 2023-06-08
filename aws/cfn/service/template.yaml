@@ -285,10 +285,10 @@ Resources:
         - arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess
 
 
-#Outputs:
-#  ServiceSecurityGroupId:
-#   Value: !GetAtt ServiceSG.GroupId
-#    Export:
-#      Name: !Sub "${AWS::StackName}ServiceSecurityGroupId"
+Outputs:
+  ServiceName:
+   Value: !GetAtt FargateService.Name
+    Export:
+      Name: !Sub "${AWS::StackName}ServiceName"
 
 #Remember to update connection url in parameter store with the new rds db created
