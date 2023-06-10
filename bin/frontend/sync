@@ -12,10 +12,10 @@ puts "s3_bucket:            #{ENV["SYNC_S3_BUCKET"]}"
 puts "distribution_id:      #{ENV["SYNC_CLOUDFRONT_DISTRUBTION_ID"]}"
 puts "build_dir:            #{ENV["SYNC_BUILD_DIR"]}"
 
-changeset_path = ENV["SYNC_OUTPUT_CHANGESET_PATH"]
-changeset_path = changeset_path.sub(".json","-#{Time.now.to_i}.json")
+changset_path = ENV["SYNC_OUTPUT_CHANGESET_PATH"]
+changset_path = changset_path.sub(".json", "-#{Time.now.to_i}.json")
 
-puts "output_changset_path: #{changeset_path}"
+puts "output_changset_path: #{ENV["SYNC_OUTPUT_CHANGESET_PATH"]}"
 puts "auto_approve:         #{ENV["SYNC_AUTO_APPROVE"]}"
 
 puts "sync =="
@@ -26,7 +26,7 @@ AwsS3WebsiteSync::Runner.run(
   s3_bucket:             ENV["SYNC_S3_BUCKET"],
   distribution_id:       ENV["SYNC_CLOUDFRONT_DISTRUBTION_ID"],
   build_dir:             ENV["SYNC_BUILD_DIR"],
-  output_changset_path:  changeset_path,
+  output_changset_path:  changset_path,
   auto_approve:          ENV["SYNC_AUTO_APPROVE"],
   silent: "ignore,no_change",
   ignore_files: [
