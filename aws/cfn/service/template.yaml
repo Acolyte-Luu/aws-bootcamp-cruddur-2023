@@ -288,7 +288,7 @@ Resources:
 Outputs:
   ServiceName:
    Value: !GetAtt FargateService.Name
-    Export:
-      Name: !Sub "${AWS::StackName}ServiceName"
+   Export:
+     Name: !Sub "${AWS::StackName}ServiceName"
 
 #Remember to update connection url in parameter store with the new rds db created

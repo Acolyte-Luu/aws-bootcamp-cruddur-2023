@@ -1,1 +1,4 @@
 #cpoy build folder contents to s3bucket when frontend stack is created
+
+#update envars DB_SG_ID and DB_SG_RULE_ID to connect to new DB created
+
