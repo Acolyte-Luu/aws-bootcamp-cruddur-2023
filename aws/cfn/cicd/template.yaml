@@ -59,7 +59,9 @@ Resources:
                 BranchName: !Ref GithubBranch
                 OutputArtifactFormat: "CODE_ZIP"
 
-            - Name: Build
+        - Name: Build
+          Actions:
+            - Name: BuildContainerImage
               RunOrder: 1
               ActionTypeId:
                 Category: Build
