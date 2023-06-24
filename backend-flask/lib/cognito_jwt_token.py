@@ -3,6 +3,8 @@ import requests
 from jose import jwk, jwt
 from jose.exceptions import JOSEError
 from jose.utils import base64url_decode
+from functools import wraps, partial
+from flask import g
 
 class FlaskAWSCognitoError(Exception):
   pass
@@ -112,3 +114,17 @@ class CognitoJwtToken:
 
         self.claims = claims 
         return claims
+
+    def jwt_required(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            access_token = extract_access_token(request_headers=)
+            try:
+                claims = cognito_jwt_token.verify(access_token)
+                g.cognito_user_id = claims['sub']
+            except TokenVerifyError as e:
+                #unauthenticated request
+                app.logger.debug(e)
+                return {}, 401
+            return f(*args, **kwargs)
+        return decorated_function

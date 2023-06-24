@@ -61,6 +61,7 @@ export default function ReplyForm(props) {
   }
 
   const close = (event)=> {
+    console.log('close',event.target)
     if (event.target.classList.contains("reply_popup")) {
       props.setPopped(false)
     }
