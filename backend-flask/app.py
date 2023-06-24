@@ -17,7 +17,7 @@ from services.show_activity import *
 from services.users_short import *
 from services.update_profile import *
 
-from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError
+from lib.cognito_jwt_token import CognitoJwtToken, extract_access_token, TokenVerifyError, jwt_required
 
 # Honeycomb
 from opentelemetry import trace
@@ -221,8 +221,16 @@ def data_create_message():
     app.logger.debug(e)
     return {}, 401
 
+def default_home_feed(e):
+  app.logger.debug(e)
+  app.logger.debug("unauthenticated")
+  data = HomeActivities.run()
+  return data, 200
+
+
 
 @app.route("/api/activities/home", methods=['GET'])
+@jwt_required(on_error=default_home_feed)
 def data_home():
   access_token = extract_access_token(request.headers)
   try:
