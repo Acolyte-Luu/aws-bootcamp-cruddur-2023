@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+set -e # stop execution of script if anything fails
+
+TEMPLATE_PATH="/workspace/aws-bootcamp-cruddur-2023/.aws-sam/build/template.yaml"
+OUTPUT_TEMPLATE_PATH="/workspace/aws-bootcamp-cruddur-2023/.aws-sam/build/packaged.yaml"
+CONFIG_PATH="/workspace/aws-bootcamp-cruddur-2023/dynamodb/config.toml"
+ARTIFACT_BUCKET="cfn-artifacts-luu"
+
+echo "PACKAGE STAGE========="
+
+sam package \
+--s3-bucket $ARTIFACT_BUCKET \
+--s3-prefix dynamodb \
+--config-file $CONFIG_PATH \
+--output-template-file $OUTPUT_TEMPLATE_PATH \
+--template-file $TEMPLATE_PATH
+

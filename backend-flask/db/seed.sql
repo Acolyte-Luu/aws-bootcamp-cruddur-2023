@@ -2,7 +2,7 @@
 INSERT INTO public.users (display_name, email, handle, cognito_user_id)
 VALUES
   ('Kwadwo Addo', 'yharnamfc@outlook.com', 'luu' ,'MOCK'),
-  ('John Snow', 'kwadwoaddo97@gmail.com', 'unamused' ,'MOCK'),
+  ('angelo ogbonna', 'kwadwoaddo97@gmail.com', 'captain_ogbonna' ,'MOCK'),
   ('Khal Drogo', 'khaleesidaddy@gmail.com', 'BigDrogo' ,'MOCK')
   ;
 
