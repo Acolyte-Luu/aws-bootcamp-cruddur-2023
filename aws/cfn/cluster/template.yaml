@@ -57,7 +57,7 @@ Parameters:
     Type: Number
     Default: 2
 
-  BackendContainerPort:
+  BackendPort:
     Type: Number
     Default: 4567
 
@@ -69,9 +69,9 @@ Parameters:
     Type: String
     Default: "/api/health-check"
 
-  #BackendHealthCheckPort:
-  #  Type: Number
-  #  Default: 80
+  BackendHealthCheckPortNum:
+    Type: Number
+    Default: 4567
 
   BackendHealthCheckProtocol:
     Type: String
@@ -170,7 +170,6 @@ Resources:
       Actions:
         - Type: forward
           TargetGroupArn: !Ref BackendTG
-
       ListenerArn: !Ref HTTPSListener
       Priority: 1
 
@@ -205,20 +204,20 @@ Resources:
       SecurityGroupIngress:
         - IpProtocol: tcp
           SourceSecurityGroupId: !GetAtt ALBSG.GroupId
-          FromPort: !Ref BackendContainerPort
-          ToPort: !Ref BackendContainerPort
+          FromPort: !Ref BackendPort
+          ToPort: !Ref BackendPort
           Description: ALB HTTP
 
   BackendTG:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       #Name: !Sub "${AWS::StackName}BackendTG"
-      Port: !Ref BackendContainerPort
+      Port: !Ref BackendPort
       HealthCheckProtocol: !Ref BackendHealthCheckProtocol
       HealthCheckEnabled: true
       HealthCheckIntervalSeconds: !Ref BackendHealthCheckIntervalSeconds
       HealthCheckPath: !Ref BackendHealthCheckPath
-      HealthCheckPort: !Ref BackendContainerPort
+      HealthCheckPort: !Ref BackendHealthCheckPortNum
       HealthCheckTimeoutSeconds: !Ref BackendHealthCheckTimeoutSeconds
       HealthyThresholdCount: !Ref BackendHealthyThresholdCount
       UnhealthyThresholdCount: !Ref BackendUnhealthyThresholdCount
