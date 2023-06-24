@@ -2,3 +2,7 @@
 bucket = 'cfn-artifacts-luu'
 region = 'us-east-1'
 stack_name = 'CruddurServiceBackendFlask'
+
+[parameters]
+EnvFrontendURL = 'https://acolyteluu.cloud'
+EnvBackendURL = 'https://api.acolyteluu.cloud'
