@@ -266,9 +266,6 @@ Resources:
         - Key: target-group-name
           Value: frontend
 
-
-#Metadata:
-#Mappings
 Outputs:
   ALBSecurityGroupId:
     Value: !GetAtt ALBSG.GroupId
