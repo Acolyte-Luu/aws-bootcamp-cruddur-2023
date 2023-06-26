@@ -5,6 +5,7 @@ from jose.exceptions import JOSEError
 from jose.utils import base64url_decode
 from functools import wraps, partial
 from flask import g
+import os
 
 class FlaskAWSCognitoError(Exception):
   pass
