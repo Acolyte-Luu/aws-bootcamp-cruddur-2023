@@ -4,7 +4,8 @@ from jose import jwk, jwt
 from jose.exceptions import JOSEError
 from jose.utils import base64url_decode
 from functools import wraps, partial
-from flask import g
+from flask import g, request
+from flask import current_app as app
 import os
 
 class FlaskAWSCognitoError(Exception):
