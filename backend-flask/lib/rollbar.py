@@ -1,13 +1,13 @@
 import rollbar
 import rollbar.contrib.flask
-from flask import got_request_exception
 import os
 from flask import got_request_exception
 from time import strftime
 from flask import current_app as app
+from flask import request, g
 
 
-def init_rollbar():
+def init_rollbar(app):
     rollbar_access_token = os.getenv('ROLLBAR_ACCESS_TOKEN')
     rollbar.init(
         # access token
@@ -21,5 +21,5 @@ def init_rollbar():
 
     # send exceptions from `app` to rollbar, using flask's signal system.
     got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
-    return rollbar
+    return  rollbar
 
