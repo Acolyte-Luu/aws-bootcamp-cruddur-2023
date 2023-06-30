@@ -3,6 +3,12 @@
   flex-direction: column;
   border-bottom: solid 1px rgb(59, 70, 97);
   overflow: hidden;
+
+}
+.replies{
+  padding-left: 28px;
+}
+.activity_reply_main{
   padding: 16px;
 }
 .activity_item:last-child {
