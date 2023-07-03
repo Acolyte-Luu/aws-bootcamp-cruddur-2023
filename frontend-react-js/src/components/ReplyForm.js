@@ -7,6 +7,7 @@ import {getAccessToken} from '../lib/CheckAuth';
 export default function ReplyForm(props) {
   const [count, setCount] = React.useState(0);
   const [message, setMessage] = React.useState('');
+  const [errors, setErrors] = React.useState({});
 
   const classes = []
   classes.push('count')
@@ -51,6 +52,9 @@ export default function ReplyForm(props) {
         console.log(res)
       }
     } catch (err) {
+      setErrors({
+        generic_500: "Server encountered an error"
+       })
       console.log(err);
     }
   }
