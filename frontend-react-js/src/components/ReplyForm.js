@@ -3,11 +3,12 @@ import React from "react";
 import process from 'process';
 import ActivityContent  from '../components/ActivityContent';
 import {getAccessToken} from '../lib/CheckAuth';
+import FormErrors  from '../components/FormErrors';
 
 export default function ReplyForm(props) {
   const [count, setCount] = React.useState(0);
   const [message, setMessage] = React.useState('');
-  const [errors, setErrors] = React.useState({});
+  const [errors, setErrors] = React.useState([]);
 
   const classes = []
   classes.push('count')
@@ -49,12 +50,11 @@ export default function ReplyForm(props) {
         setMessage('')
         props.setPopped(false)
       } else {
-        console.log(res)
+        setErrors(data)
+        console.log(res,data)
       }
     } catch (err) {
-      setErrors({
-        generic_500: "Server encountered an error"
-       })
+      setErrors([`generic_${res.status}`])
       console.log(err);
     }
   }
@@ -103,6 +103,7 @@ export default function ReplyForm(props) {
                 <div className={classes.join(' ')}>{240-count}</div>
                 <button type='submit'>Reply</button>
               </div>
+              <FormErrors errors={errors} />
             </form>
           </div>
         </div>

@@ -1,23 +1,19 @@
-import { json } from 'react-router-dom';
 import './FormErrors.css';
-import './FormErrorItem.js' ;
+import FormErrorItem from 'components/FormErrorItem';
 
 export default function FormErrors(props) {
     let el_errors = null
 
-
-    if (props.errors.Object.keys() > 0){
-        el_errors_items
-        {Object.keys(props.errors).map((key,index) => (  
-            return <FormErrorItem key={index} value={props.errors[key]}/>
-        ))}
-
+    if (props.errors.length > 0){
+       el_errors = (<div className='errors'>
+        {props.errors.map(err_code => {
+          return <FormErrorItem err_code={err_code} />
+        })}
+        </div>)
     }
-
-    return(
-        <div classname = "errorsWrap">
-            
-        </div>
+    return (
+      <div className= 'errorsWrap'>
+        {el_errors}    
+      </div>
     )
-
 }
