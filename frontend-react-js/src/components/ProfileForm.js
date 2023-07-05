@@ -3,6 +3,8 @@ import React from "react";
 import process from 'process';
 import {getAccessToken} from '../lib/CheckAuth';
 import { json } from 'react-router-dom';
+import FormErrors  from '../components/FormErrors';
+import {put} from '../lib/Requests';
 
 
 export default function ProfileForm(props) {
@@ -82,33 +84,18 @@ export default function ProfileForm(props) {
 
   const onsubmit = async (event) => {
     event.preventDefault();
-    try {
-      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/profile/update`
-      await getAccessToken()
-      const access_token = localStorage.getItem("access_token")
-      const res = await fetch(backend_url, {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${access_token}`,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          bio: bio,
-          display_name: displayName
-        }),
-      });
-      let data = await res.json();
-      if (res.status === 200) {
-        setBio(null)
-        setDisplayName(null)
-        props.setPopped(false)
-      } else {
-        console.log(res)
-      }
-    } catch (err) {
-      console.log(err);
+    setErrors('')
+    const url = `${process.env.REACT_APP_BACKEND_URL}/api/profile/update`
+    const payload_data = {
+      bio: bio,
+      display_name: displayName
     }
+
+    put(url,payload_data,function(data){
+      setBio(null)
+      setDisplayName(null)
+      props.setPopped(false)
+    })
   }
 
   const bio_onchange = (event) => {
@@ -165,6 +152,7 @@ export default function ProfileForm(props) {
                 onChange={bio_onchange} 
               />
             </div>
+            <FormErrors errors={errors} />
           </div>
         </form>
       </div>

@@ -1,6 +1,5 @@
 export default function FormErrorItem(props) {
     const render_error = () => {
-        console.log('render_error', props.err_code)
         switch (props.err_code) {
             case 'generic_500':
                 return "An internal server error occured"

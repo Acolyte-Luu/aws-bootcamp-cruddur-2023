@@ -2,7 +2,7 @@ import './ActivityForm.css';
 import React from "react";
 import process from 'process';
 import {ReactComponent as BombIcon} from './svg/bomb.svg';
-import {getAccessToken} from '../lib/CheckAuth';
+import {post} from '../lib/Requests';
 import FormErrors  from '../components/FormErrors';
 
 export default function ActivityForm(props) {
@@ -19,40 +19,22 @@ export default function ActivityForm(props) {
 
   const onsubmit = async (event) => {
     event.preventDefault();
-    try {
-      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/activities`
-      console.log('onsubmit payload', message)
-      await getAccessToken()
-      const access_token = localStorage.getItem("access_token")
-      const res = await fetch(backend_url, {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${access_token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: message,
-          ttl: ttl
-        }),
-      });
-      let data = await res.json();
-      if (res.status === 200) {
-        // add activity to the feed
-        props.setActivities(current => [data,...current]);
-        // reset and close the form
-        setCount(0)
-        setMessage('')
-        setTtl('7-days')
-        props.setPopped(false)
-      } else {
-        setErrors(data)
-        console.log(res, data)
-      }
-    } catch (err) {
-      setErrors([`generic_${res.status}`])
-      console.log(err);
+    setErrors('')
+    const url = `${process.env.REACT_APP_BACKEND_URL}/api/activities`
+    const payload_data = {
+      message: message,
+      ttl: ttl
     }
-  }
+    post(url,payload_data,function(data){
+      // add activity to the feed
+      props.setActivities(current => [data,...current]);
+      // reset and close the form
+      setCount(0)
+      setMessage('')
+      setTtl('7-days')
+      props.setPopped(false)
+    })
+}
 
   const textarea_onchange = (event) => {
     setCount(event.target.value.length);
