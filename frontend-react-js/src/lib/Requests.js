@@ -1,5 +1,7 @@
 import {getAccessToken} from '../lib/CheckAuth';
-async function request(method,url,payload_data,success){
+async function request(method,url,payload_data,setErrors,success){
+  if (setErrors !== null){
+    setErrors('')}
     let res
     try {
       await getAccessToken()
@@ -20,33 +22,39 @@ async function request(method,url,payload_data,success){
       if (res.status === 200) {
         success(data)
       } else {
-        setErrors(data)
+        if (setErrors !== null){
+          setErrors(data)
+      }
         console.log(res, data)
       }
     } catch (err) {
       if (err instanceof Response) {
         console.log('HTTP error detected:', err.status);
+        if (setErrors !== null){
         setErrors([`generic_${err.status}`])
+      }
       } else {
+        if (setErrors !== null){
           setErrors([`generic_500`])
+        }
     }
   }
 }
-export function post(url,payload_data,success){
-    request('POST',url,payload_data,success)
+export function post(url,payload_data,setErrors,success){
+    request('POST',url,payload_data,setErrors,success)
     
 }
-export function put(url,payload_data,success){
-    request('PUT',url,payload_data,success)
-    
-}
-
-export function get(url,success){
-    request('GET',url,null,success)
+export function put(url,payload_data,setErrors,success){
+    request('PUT',url,payload_data,setErrors,success)
     
 }
 
-export function destroy(url,payload_data,success){
-    request('DELETE',url,payload_data,success)
+export function get(url,setErrors,success){
+    request('GET',url,null,setErrors,success)
+    
+}
+
+export function destroy(url,payload_data,setErrors,success){
+    request('DELETE',url,payload_data,setErrors,success)
     
 }

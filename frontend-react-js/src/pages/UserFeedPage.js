@@ -25,7 +25,7 @@ export default function UserFeedPage() {
 
   const loadData = async () => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/@${params.handle}`
-    get(url,function(data){
+    get(url,null,function(data){
         setProfile(data.profile)
         setActivities(data.activities)
     })
