@@ -18,6 +18,7 @@ import {
 } from "react-router-dom";
 
 import { Amplify } from 'aws-amplify';
+import ActivityShowPage from 'pages/ActivityShowPage';
 
 Amplify.configure({
   "AWS_PROJECT_REGION": process.env.REACT_APP_AWS_PROJECT_REGION,
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
   {
     path: "/@:handle",
     element: <UserFeedPage />
+  },
+  {
+    path: "/@:handle/status/:activity_uuid",
+    element: <ActivityShowPage />
   },
   {
     path: "/messages",

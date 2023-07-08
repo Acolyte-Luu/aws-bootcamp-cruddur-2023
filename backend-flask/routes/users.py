@@ -8,6 +8,7 @@ from flask import Flask
 from services.users_short import *
 from services.update_profile import *
 from services.user_activities import *
+from services.show_activity import *
 
 from lib.cognito_jwt_token import jwt_required
 from lib.helpers import model_json
@@ -17,10 +18,14 @@ from flask_cors import cross_origin
 
 def load(app):
   @app.route("/api/activities/@<string:handle>", methods=['GET'])
-  def data_handle(handle):
+  def data_users_activities(handle):
     model = UserActivities.run(handle)
     return model_json(model)
 
+  @app.route("/api/activities/@<string:handle>/status/<string:activity_uuid>", methods=['GET'])
+  def data_show_activity(handle,activity_uuid):
+    data = ShowActivities.run(activity_uuid)
+    return data, 200
  
   @app.route("/api/profile/update", methods=['POST','OPTIONS'])
   @cross_origin()

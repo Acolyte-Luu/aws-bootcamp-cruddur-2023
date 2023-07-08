@@ -5,6 +5,15 @@
   overflow: hidden;
 
 }
+
+a.activity_item {
+  text-decoration: none;
+}
+
+a.activity_item:hover {
+  background: rgba(255, 255, 255, 0.12);
+
+}
 .replies{
   padding-left: 28px;
 }
@@ -20,6 +29,7 @@
   align-items: flex-end;
   padding-top: 16px;
   padding-left: 60px;
+  
 }
 
 .activity_item .activity_actions .action{
@@ -49,4 +59,5 @@
 
 .activity_item .activity_actions .action:hover .icon {
   fill: rgb(149,0,255);
+  
 }

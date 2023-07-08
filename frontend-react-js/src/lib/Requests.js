@@ -1,60 +1,68 @@
 import {getAccessToken} from '../lib/CheckAuth';
-async function request(method,url,payload_data,setErrors,success){
-  if (setErrors !== null){
-    setErrors('')}
+
+async function request(method,url,payload_data,options){
+  if (options.hasOwnProperty('setErrors')){
+    options.setErrors('')}
     let res
     try {
-      await getAccessToken()
-      const access_token = localStorage.getItem("access_token")
+
       const attrs = {
         method: method,
         headers: {
-          'Authorization': `Bearer ${access_token}`,
           'Content-Type': 'application/json'
         },
         
       }
+
+      if (options.hasOwnProperty('auth') && options.auth === true){
+        await getAccessToken()
+        const access_token = localStorage.getItem("access_token")
+        attrs.headers['Authorization'] = `Bearer ${access_token}`
+      }
+
+
       if (method !== 'GET'){
         attrs.body = JSON.stringify(payload_data)
         }
       res = await fetch(url,attrs);
       let data = await res.json();
       if (res.status === 200) {
-        success(data)
+        options.success(data)
       } else {
         if (setErrors !== null){
-          setErrors(data)
+          options.setErrors(data)
       }
         console.log(res, data)
       }
     } catch (err) {
       if (err instanceof Response) {
         console.log('HTTP error detected:', err.status);
-        if (setErrors !== null){
-        setErrors([`generic_${err.status}`])
+        if (options.hasOwnProperty('setErrors')){
+          options.setErrors([`generic_${err.status}`])
       }
       } else {
-        if (setErrors !== null){
-          setErrors([`generic_500`])
+        if (options.hasOwnProperty('setErrors')){
+          options.setErrors([`generic_500`])
         }
     }
   }
 }
-export function post(url,payload_data,setErrors,success){
-    request('POST',url,payload_data,setErrors,success)
+export function post(url,payload_data,options){
+    request('POST',url,payload_data,options)
     
 }
-export function put(url,payload_data,setErrors,success){
-    request('PUT',url,payload_data,setErrors,success)
-    
-}
-
-export function get(url,setErrors,success){
-    request('GET',url,null,setErrors,success)
+export function put(url,payload_data,options){
+    request('PUT',url,payload_data,options)
     
 }
 
-export function destroy(url,payload_data,setErrors,success){
-    request('DELETE',url,payload_data,setErrors,success)
+export function get(url,options){
+    request('GET',url,null,options)
     
 }
+
+export function destroy(url,payload_data,options){
+    request('DELETE',url,payload_data,options)
+    
+}
+
