@@ -4,12 +4,12 @@ import React from "react";
 import DesktopNavigation  from '../components/DesktopNavigation';
 import DesktopSidebar     from '../components/DesktopSidebar';
 import ActivityForm from '../components/ActivityForm';
-import ActivityItem from '../components/ActivityItem';
+import ActivityShowItem from '../components/ActivityShowItem';
 import ReplyForm from '../components/ReplyForm';
 import Replies from '../components/Replies';
 import {checkAuth} from '../lib/CheckAuth';
 import {get} from '../lib/Requests';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function ActivityShowPage() {
   const [replies, setReplies] = React.useState([]);
@@ -20,6 +20,11 @@ export default function ActivityShowPage() {
   const [user, setUser] = React.useState(null);
   const dataFetchedRef = React.useRef(false);
   const params = useParams();
+
+  const navigate = useNavigate()
+  const goBack = () => {
+    navigate(-1)
+  }
 
   const loadData = async () => {
     const url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/@${params.handle}/status/${params.activity_uuid}`
@@ -44,10 +49,11 @@ export default function ActivityShowPage() {
   let el_activity
   if (activity != null){
     el_activity = (
-      <ActivityItem 
-      setReplyActivity={setReplyActivity} 
-      setPopped={setPoppedReply}  
-      activity={activity}
+      <ActivityShowItem
+        expanded = {true}
+        setReplyActivity={setReplyActivity} 
+        setPopped={setPoppedReply}  
+        activity={activity}
   />
     )
 
@@ -64,12 +70,14 @@ export default function ActivityShowPage() {
         />
         <ReplyForm 
           activity={replyActivity} 
-          popped={poppedReply} 
+          popped={poppedReply}
+          setReplies = {setReplies}
           setPopped={setPoppedReply}  
         />
         <div className='activity_feed'>  
-          <div className='activity_feed_heading'>
-            <div className='title'>Home</div>
+          <div className='activity_feed_heading flex'>\
+          <div className= "back" onClick={goBack}>&larr;</div>
+            <div className='title'>Crud</div>
         </div>
         {el_activity}
         <Replies

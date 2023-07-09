@@ -44,5 +44,6 @@ for migration_file in migration_files:
     file_time = int(match.group())
     if last_successful_run < file_time:
       mod = importlib.import_module(module_name)
+      print("RUNNING MIGRATION: ",module_name)
       mod.migration.migrate()
       last_successful_run = set_last_successful_run(file_time)

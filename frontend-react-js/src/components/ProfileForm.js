@@ -144,7 +144,7 @@ export default function ProfileForm(props) {
                 type="text"
                 placeholder="Display Name"
                 value={displayName}
-                onChange={display_name_onchange} 
+                onChange={display_name_onchange}
               />
             </div>
             <div className="field bio">
