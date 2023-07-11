@@ -9,8 +9,9 @@ import {put} from '../lib/Requests';
 
 export default function ProfileForm(props) {
   const [bio, setBio] = React.useState(0);
-  const [presignedurl, setPresignedurl] = React.useState(0);
+  
   const [displayName, setDisplayName] = React.useState(0);
+  const [errors, setErrors] = React.useState('');
 
   React.useEffect(()=>{
     setBio(props.profile.bio || '');
