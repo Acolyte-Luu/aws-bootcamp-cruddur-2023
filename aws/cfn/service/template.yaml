@@ -89,9 +89,9 @@ Parameters:
     Type: String
     Default: 'arn:aws:ssm:us-east-1:713826515582:parameter/cruddur/backend-flask/OTEL_EXPORTER_OTLP_HEADERS'
 
-  #CruddurExecutionPolicy:
-  #  Type: String
-  #  Default: 'arn:aws:iam::713826515582:policy/CruddurServiceExecutionPolicy'
+  DynamoDBMessagesTable:
+    Type: String
+    Default: cruddur-messages
 
   CruddurExecutionRole:
     Type: String
@@ -194,6 +194,8 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: !Ref ServiceName
           Environment:
+            - Name: "DYNAMODB_MESSAGES_TABLE"
+              Value: !Ref DynamoDBMessagesTable
             - Name: "OTEL_SERVICE_NAME"
               Value: !Ref EnvOTELServiceName
             - Name: "OTEL_EXPORTER_OTLP_ENDPOINT"
