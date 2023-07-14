@@ -12,4 +12,9 @@ VALUES
     (SELECT uuid from public.users WHERE users.handle = 'luu' LIMIT 1),
     'This was imported as seed data!',
     current_timestamp + interval '10 day'
-  )
+  ),
+  (
+    (SELECT uuid from public.users WHERE users.handle = 'captain_ogbonna' LIMIT 1),
+    'I am the other guy!',
+    current_timestamp + interval '10 day'
+  );

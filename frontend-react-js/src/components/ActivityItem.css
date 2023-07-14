@@ -3,6 +3,21 @@
   flex-direction: column;
   border-bottom: solid 1px rgb(59, 70, 97);
   overflow: hidden;
+
+}
+
+.activity_item.clickable:hover {
+  cursor: pointer;
+}
+
+.activity_item.clickable:hover {
+  background: rgba(255, 255, 255, 0.12);
+
+}
+.replies{
+  padding-left: 28px;
+}
+.activity_reply_main{
   padding: 16px;
 }
 .activity_item:last-child {
@@ -14,6 +29,7 @@
   align-items: flex-end;
   padding-top: 16px;
   padding-left: 60px;
+  
 }
 
 .activity_item .activity_actions .action{
@@ -43,4 +59,13 @@
 
 .activity_item .activity_actions .action:hover .icon {
   fill: rgb(149,0,255);
+  
+}
+
+.activity_item.expanded.activity_content {
+  display: flex;
+}
+
+.activity_item.expanded.activity_content.activity_identity {
+  flex-grow: 1;
 }

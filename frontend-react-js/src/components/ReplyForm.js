@@ -2,10 +2,13 @@ import './ReplyForm.css';
 import React from "react";
 import process from 'process';
 import ActivityContent  from '../components/ActivityContent';
+import FormErrors  from '../components/FormErrors';
+import {post} from '../lib/Requests';
 
 export default function ReplyForm(props) {
   const [count, setCount] = React.useState(0);
   const [message, setMessage] = React.useState('');
+  const [errors, setErrors] = React.useState([]);
 
   const classes = []
   classes.push('count')
@@ -15,40 +18,33 @@ export default function ReplyForm(props) {
 
   const onsubmit = async (event) => {
     event.preventDefault();
-    try {
-      const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/${props.activity.uuid}/reply`
-      const res = await fetch(backend_url, {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          message: message
-        }),
-      });
-      let data = await res.json();
-      if (res.status === 200) {
-        // add activity to the feed
-
-        let activities_deep_copy = JSON.parse(JSON.stringify(props.activities))
-        let found_activity = activities_deep_copy.find(function (element) {
-          return element.uuid ===  props.activity.uuid;
-        });
-        found_activity.replies.push(data)
-
-        props.setActivities(activities_deep_copy);
-        // reset and close the form
-        setCount(0)
-        setMessage('')
-        props.setPopped(false)
-      } else {
-        console.log(res)
-      }
-    } catch (err) {
-      console.log(err);
+    const url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/${props.activity.uuid}/reply`
+    const payload_data = {
+      activity_uuid: props.activity.uuid,
+      message: message
     }
-  }
+    post(url,payload_data,{
+      auth: true,
+      setErrors: setErrors,
+      success: function(data){
+        if (props.setReplies){
+          props.setReplies(current => [data,...current])
+        }
+          // add activity to the feed
+          //let activities_deep_copy = JSON.parse(JSON.stringify(props.activities))
+          //let found_activity = activities_deep_copy.find(function (element) {
+          //  return element.uuid ===  props.activity.uuid;
+          //});
+          //found_activity.replies.push(data)
+          //props.setActivities(activities_deep_copy);
+          // reset and close the form
+          setCount(0)
+          setMessage('')
+          props.setPopped(false)
+      
+    }
+  })
+}
 
   const textarea_onchange = (event) => {
     setCount(event.target.value.length);
@@ -94,6 +90,7 @@ export default function ReplyForm(props) {
                 <div className={classes.join(' ')}>{240-count}</div>
                 <button type='submit'>Reply</button>
               </div>
+              <FormErrors errors={errors} />
             </form>
           </div>
         </div>
