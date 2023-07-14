@@ -6,4 +6,4 @@ stack_name = 'CruddurServiceBackendFlask'
 [parameters]
 EnvFrontendURL = 'https://acolyteluu.cloud'
 EnvBackendURL = 'https://api.acolyteluu.cloud'
-DynamoDBMessagesTable = 'CruddurDynamodb-DynamoDBTable-1T54S9FFI35DR'
+DynamoDBMessagesTable = 'CruddurDynamodb-DynamoDBTable-1N2CAZND5ZUPM'

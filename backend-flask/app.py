@@ -9,7 +9,7 @@ from lib.rollbar import init_rollbar
 from lib.xray import init_xray
 from lib.honeycomb import init_honeycomb
 from lib.cors import init_cors
-from lib.cloudwatch import init_cloudwatch
+#from lib.cloudwatch import init_cloudwatch
 from lib.helpers import model_json
 from lib.cognito_jwt_token import jwt_required
 

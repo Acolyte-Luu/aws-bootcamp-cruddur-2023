@@ -63,11 +63,9 @@ Parameters:
 
   EnvFrontendURL:
     Type: String
-    Default: '*'
 
   EnvBackendURL:
     Type: String
-    Default: '*'
 
   SecretsAWSAccessKeyId:
     Type: String
@@ -92,6 +90,10 @@ Parameters:
   DynamoDBMessagesTable:
     Type: String
     Default: cruddur-messages
+
+  EnvFlaskEnv:
+    Type: String
+    Default: production
 
   CruddurExecutionRole:
     Type: String
@@ -194,6 +196,8 @@ Resources:
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: !Ref ServiceName
           Environment:
+            - Name: "FLASK_ENV"
+              Value: !Ref EnvFlaskEnv
             - Name: "DYNAMODB_MESSAGES_TABLE"
               Value: !Ref DynamoDBMessagesTable
             - Name: "OTEL_SERVICE_NAME"
