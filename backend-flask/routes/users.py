@@ -27,7 +27,7 @@ def load(app):
     data = ShowActivities.run(activity_uuid)
     return data, 200
  
-  @app.route("/api/profile/update", methods=['POST','OPTIONS'])
+  @app.route("/api/profile/update", methods=['POST','OPTIONS','PUT'])
   @cross_origin()
   @jwt_required()
   def data_update_profile():
