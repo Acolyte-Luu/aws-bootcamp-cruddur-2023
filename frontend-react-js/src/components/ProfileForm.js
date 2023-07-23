@@ -86,6 +86,7 @@ export default function ProfileForm(props) {
   const onsubmit = async (event) => {
     event.preventDefault();
     const url = `${process.env.REACT_APP_BACKEND_URL}/api/profile/update`
+    console.log('url',url)
     const payload_data = {
       bio: bio,
       display_name: displayName
