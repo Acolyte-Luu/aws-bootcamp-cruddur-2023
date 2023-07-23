@@ -8,10 +8,10 @@ import {put} from '../lib/Requests';
 
 
 export default function ProfileForm(props) {
-  const [bio, setBio] = React.useState(0);
+  const [bio, setBio] = React.useState('');
   
   const [displayName, setDisplayName] = React.useState(0);
-  const [errors, setErrors] = React.useState('');
+  const [errors, setErrors] = React.useState([]);
 
   React.useEffect(()=>{
     setBio(props.profile.bio || '');
@@ -132,14 +132,7 @@ export default function ProfileForm(props) {
             </div>
           </div>
           <div className="popup_content">
-
-            <div className="upload" onClick={s3uploadkey}>
-              Upload Avatar
-            </div>
-            <input type="file" name="avatarupload" onChange={s3upload}/>
-            <div className="upload" onClick={s3upload}>
-              Upload Avatar Real
-            </div>
+            <input type="file" name="avatarupload" onChange={s3upload} />
             <div className="field display_name">
               <label>Display Name</label>
               <input
