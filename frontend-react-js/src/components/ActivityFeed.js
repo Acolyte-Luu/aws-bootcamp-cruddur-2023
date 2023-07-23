@@ -1,5 +1,5 @@
-import './ActivityFeed.css';
-import ActivityItem from './ActivityItem';
+import "./ActivityFeed.css";
+import ActivityItem from "./ActivityItem";
 
 export default function ActivityFeed(props) {
   let content;
@@ -8,10 +8,19 @@ export default function ActivityFeed(props) {
       <span>Nothing to see here yet</span>
     </div>
   } else {
+    let items;
+    if (props.showType === "notifications") {
+      items = props.activities.map(activity => {
+        return <ActivityItem setReplyActivity={props.setReplyActivity} setPopped={props.setPopped} key={activity.uuid} activity={activity} />
+        })
+    } else if (props.showType === "home") {
+      items = props.activities.map(activity => {
+        return  <ActivityItem setReplyActivity={props.setReplyActivity} setPopped={props.setPopped} key={activity.uuid} activity={activity} />
+        })
+    }
     content = <div className='activity_feed_collection'>
-      {props.activities.map(activity => {
-      return  <ActivityItem setReplyActivity={props.setReplyActivity} setPopped={props.setPopped} key={activity.uuid} activity={activity} />
-      })}
+        {items} 
+      
     </div>
   }
 
