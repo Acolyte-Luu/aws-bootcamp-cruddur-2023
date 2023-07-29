@@ -1,7 +1,7 @@
 [deploy]
 bucket = 'cfn-artifacts-luu'
 region = 'us-east-1'
-stack_name = 'CruddurServiceFrontend'
+stack_name = 'CrdFrontend'
 
 [parameters]
 WWWBucketName = 'www.acolyteluu.cloud'

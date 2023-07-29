@@ -9,7 +9,7 @@ echo "DEPLOY STAGE========="
 sam deploy \
 --template-file $PACKAGED_TEMPLATE_PATH \
 --config-file $CONFIG_PATH \
---stack-name "CruddurDynamodb" \
+--stack-name "CrdDdb" \
 --no-execute-changeset \
 --tags group=cruddur-dynamodb \
 --capabilities "CAPABILITY_NAMED_IAM"
