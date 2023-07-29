@@ -11,12 +11,17 @@ export default function ActivityShowItem(props) {
 
   const attrs = {}
   attrs.className = 'activity_item expanded'
+  const avatarStyles = {
+    backgroundImage: `url("https://acolyteluu.cloud/avatars/${props.activity.cognito_user_id}.jpg")`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  };
     
   return (
     <div {...attrs} >
       <div className='activity_reply_main'>
         <div className='activity_content_wrap'>
-          <Link className='activity_avatar' to={`/@`+props.activity.handle}></Link>
+          <Link className='activity_avatar' to={`/@`+props.activity.handle} style={avatarStyles}></Link>
           <div className='activity_content'>
             <div className='activity_meta'>
               <div className='activity_identity' >

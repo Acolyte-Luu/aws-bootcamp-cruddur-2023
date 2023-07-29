@@ -10,12 +10,12 @@ Parameters:
   NetworkingStack:
     Type: String
     Description: This is our base layer of network components(VPC,subnets)
-    Default: CruddurNetwork
+    Default: CrdNet
 
   ClusterStack:
     Type: String
     Description: This is our base layer of infrastructure(ALB,TG,SG)
-    Default: CruddurCluster
+    Default: CrdCluster
 
   ContainerName:
     Type: String

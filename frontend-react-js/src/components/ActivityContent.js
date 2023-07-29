@@ -16,7 +16,7 @@ export default function ActivityContent(props) {
   }
 
   const avatarStyles = {
-    backgroundImage: `url("https://assets.acolyteluu.cloud/avatars/${props.activity.cognito_user_id}.jpg")`,
+    backgroundImage: `url("https://acolyteluu.cloud/avatars/${props.activity.cognito_user_id}.jpg")`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
   };
